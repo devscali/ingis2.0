@@ -56,14 +56,15 @@ export default function Sidebar({ isOpen, onClose }) {
       {/* Sidebar */}
       <aside
         className={`
-          h-full w-[280px] z-50
+          fixed lg:sticky top-0 left-0 h-screen w-[260px] sm:w-[280px] z-50
           glass-sidebar flex flex-col
           transition-transform duration-300 ease-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0
         `}
       >
         {/* Header */}
-        <div className="p-6 border-b border-white/10">
+        <div className="p-4 sm:p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
@@ -98,10 +99,10 @@ export default function Sidebar({ isOpen, onClose }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4">
+        <nav className="flex-1 overflow-y-auto p-3 sm:p-4">
           {Object.entries(sections).map(([section, items]) => (
-            <div key={section} className="mb-6">
-              <p className="px-4 mb-2 text-xs font-semibold text-white/40 uppercase tracking-wider">
+            <div key={section} className="mb-4 sm:mb-6">
+              <p className="px-3 sm:px-4 mb-2 text-xs font-semibold text-white/40 uppercase tracking-wider">
                 {section}
               </p>
               {items.map((item) => (

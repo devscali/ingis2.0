@@ -39,7 +39,7 @@ export default function Layout() {
         </header>
 
         {/* Page Content */}
-        <div className="p-8 lg:px-16 lg:py-12 pt-24 lg:pt-12 min-h-screen">
+        <div className="p-4 sm:p-6 lg:px-12 xl:px-16 lg:py-10 pt-20 lg:pt-10 min-h-screen max-w-7xl mx-auto">
           <Outlet />
         </div>
       </main>

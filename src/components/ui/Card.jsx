@@ -29,13 +29,13 @@ export function StatCard({ icon: Icon, value, label, color = 'orange' }) {
 
   return (
     <Card hover={false}>
-      <div className="flex items-center gap-4">
-        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${colors[color]} flex items-center justify-center`}>
-          <Icon className="w-7 h-7" />
+      <div className="flex items-center gap-3 sm:gap-4">
+        <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${colors[color]} flex items-center justify-center flex-shrink-0`}>
+          <Icon className="w-5 h-5 sm:w-7 sm:h-7" />
         </div>
-        <div>
-          <p className="text-3xl font-bold">{value}</p>
-          <p className="text-sm text-white/50">{label}</p>
+        <div className="min-w-0">
+          <p className="text-2xl sm:text-3xl font-bold">{value}</p>
+          <p className="text-xs sm:text-sm text-white/50 truncate">{label}</p>
         </div>
       </div>
     </Card>
@@ -45,11 +45,11 @@ export function StatCard({ icon: Icon, value, label, color = 'orange' }) {
 export function QuickAction({ icon: Icon, title, description, onClick }) {
   return (
     <Card onClick={onClick} className="text-center">
-      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center mx-auto mb-3">
-        <Icon className="w-6 h-6 text-orange-400" />
+      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center mx-auto mb-2 sm:mb-3">
+        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
       </div>
-      <h3 className="font-semibold mb-1">{title}</h3>
-      <p className="text-sm text-white/50">{description}</p>
+      <h3 className="font-semibold mb-0.5 sm:mb-1 text-sm sm:text-base">{title}</h3>
+      <p className="text-xs sm:text-sm text-white/50">{description}</p>
     </Card>
   )
 }

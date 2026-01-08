@@ -135,19 +135,19 @@ ${noteText}`
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-10"
+      className="space-y-6 sm:space-y-8"
     >
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-3 flex items-center gap-3">
-          <Flame className="w-8 h-8 text-orange-500" />
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3">
+          <Flame className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
           TorchAI
         </h1>
-        <p className="text-white/50">Captura notas por voz o texto y deja que la IA las organice</p>
+        <p className="text-white/50 text-sm sm:text-base">Captura notas por voz o texto y deja que la IA las organice</p>
       </div>
 
       {/* Tabs */}
-      <div className="glass p-2 rounded-2xl flex gap-2 max-w-xl">
+      <div className="glass p-1.5 sm:p-2 rounded-xl sm:rounded-2xl flex gap-1 sm:gap-2 overflow-x-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (
@@ -155,17 +155,17 @@ ${noteText}`
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`
-                flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold transition-all
+                flex-1 min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all text-sm sm:text-base
                 ${activeTab === tab.id
                   ? 'bg-orange-500 text-white'
                   : 'text-white/50 hover:text-white hover:bg-white/5'
                 }
               `}
             >
-              <Icon className="w-5 h-5" />
-              <span className="hidden sm:inline">{tab.label}</span>
+              <Icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <span className="hidden sm:inline truncate">{tab.label}</span>
               {tab.id === 'tasks' && activeTasks.length > 0 && (
-                <span className="px-2 py-0.5 text-xs rounded-full bg-white/20">
+                <span className="px-1.5 sm:px-2 py-0.5 text-xs rounded-full bg-white/20 flex-shrink-0">
                   {activeTasks.length}
                 </span>
               )}
@@ -181,7 +181,7 @@ ${noteText}`
           animate={{ opacity: 1, y: 0 }}
           className="glass-card max-w-2xl"
         >
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
             <FileEdit className="w-5 h-5 text-orange-500" />
             Nueva Nota
           </h2>
@@ -194,14 +194,14 @@ Ejemplo:
 - Llamar a Juan del proyecto X urgente para mañana
 - Revisar el presupuesto de María antes del viernes
 - Comprar regalo para cumpleaños de mamá`}
-            className="glass-input w-full h-48 resize-none mb-4"
+            className="glass-input w-full h-40 sm:h-48 resize-none mb-3 sm:mb-4 text-sm sm:text-base"
           />
           <button
             onClick={handleProcess}
             disabled={processing || !noteText.trim()}
-            className="btn-accent flex items-center gap-2 disabled:opacity-50"
+            className="btn-accent flex items-center gap-2 disabled:opacity-50 text-sm sm:text-base w-full sm:w-auto justify-center"
           >
-            <Sparkles className="w-5 h-5" />
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             {processing ? 'Procesando...' : 'Procesar con IA'}
           </button>
         </motion.div>
