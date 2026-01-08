@@ -222,17 +222,17 @@ export default function WeeklyOps() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-8"
+      className="space-y-6 sm:space-y-8"
     >
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
-            <Flame className="w-6 h-6 text-white" />
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
+            <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Calidevs Ops</h1>
-            <p className="text-white/50 text-sm">Operaciones semanales del equipo</p>
+            <h1 className="text-xl sm:text-2xl font-bold">Calidevs Ops</h1>
+            <p className="text-white/50 text-xs sm:text-sm">Operaciones semanales del equipo</p>
           </div>
         </div>
 
@@ -259,11 +259,11 @@ export default function WeeklyOps() {
       </div>
 
       {/* Kanban Board */}
-      <div className="flex gap-3 overflow-x-auto pb-4">
+      <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
         {weekDays.map((day) => {
           const dayTasks = getTasksByDay(day.id)
           return (
-            <div key={day.id} className="flex-shrink-0 w-64">
+            <div key={day.id} className="flex-shrink-0 w-56 sm:w-64 lg:w-72">
               {/* Column Header */}
               <div className="flex items-center gap-2 mb-3">
                 <span className={`px-3 py-1 rounded-lg text-sm font-semibold ${day.color} text-white`}>

@@ -219,17 +219,17 @@ export default function ProjectHub() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-8"
+      className="space-y-6 sm:space-y-8"
     >
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-purple-500/30">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-lg sm:text-2xl font-bold shadow-lg shadow-purple-500/30">
             P
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Project Hub Pro</h1>
-            <p className="text-white/50">Gestión de proyectos de clase mundial</p>
+            <h1 className="text-xl sm:text-2xl font-bold">Project Hub Pro</h1>
+            <p className="text-white/50 text-xs sm:text-base">Gestión de proyectos de clase mundial</p>
           </div>
         </div>
 
@@ -267,18 +267,18 @@ export default function ProjectHub() {
       </div>
 
       {/* Team */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-white/40 uppercase tracking-wider">Equipo</span>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+        <span className="text-xs sm:text-sm text-white/40 uppercase tracking-wider">Equipo</span>
+        <div className="flex flex-wrap items-center gap-2">
           {teamMembers.map((member) => (
             <div
               key={member.id}
-              className="glass px-3 py-2 flex items-center gap-2"
+              className="glass px-2 sm:px-3 py-1.5 sm:py-2 flex items-center gap-2"
             >
-              <div className={`w-8 h-8 rounded-lg ${member.color} flex items-center justify-center text-white text-sm font-bold`}>
+              <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg ${member.color} flex items-center justify-center text-white text-xs sm:text-sm font-bold`}>
                 {member.name[0]}
               </div>
-              <div>
+              <div className="hidden sm:block">
                 <p className="text-sm font-medium">{member.name}</p>
                 <p className="text-xs text-white/40">{member.role}</p>
               </div>
@@ -288,7 +288,7 @@ export default function ProjectHub() {
       </div>
 
       {/* Quick Add Form */}
-      <form onSubmit={handleQuickAdd} className="flex flex-wrap gap-3">
+      <form onSubmit={handleQuickAdd} className="flex flex-wrap gap-2 sm:gap-3">
         <input
           type="text"
           value={quickAdd.title}
@@ -335,13 +335,13 @@ export default function ProjectHub() {
       </form>
 
       {/* Kanban Board */}
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
         {defaultColumns.map((column) => {
           const columnTasks = getTasksByColumn(column.id)
           return (
             <div
               key={column.id}
-              className="flex-shrink-0 w-72"
+              className="flex-shrink-0 w-56 sm:w-64 lg:w-72"
             >
               {/* Column Header */}
               <div className="glass rounded-xl p-4 mb-4">
