@@ -4,7 +4,8 @@ import { Menu } from 'lucide-react'
 import Sidebar from './Sidebar'
 
 export default function Layout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   return (
     <div className="min-h-screen flex">
@@ -12,13 +13,23 @@ export default function Layout() {
       <div className="gradient-mesh" />
 
       {/* Sidebar - always visible on desktop */}
-      <div className="hidden lg:block w-[280px] flex-shrink-0">
-        <Sidebar isOpen={true} onClose={() => {}} />
+      <div className={`hidden lg:block flex-shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-[80px]' : 'w-[280px]'}`}>
+        <Sidebar
+          isOpen={true}
+          onClose={() => {}}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
       </div>
 
       {/* Mobile Sidebar */}
       <div className="lg:hidden">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          isCollapsed={false}
+          onToggleCollapse={() => {}}
+        />
       </div>
 
       {/* Main Content */}
