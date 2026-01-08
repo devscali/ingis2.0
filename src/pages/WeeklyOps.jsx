@@ -378,18 +378,18 @@ export default function WeeklyOps() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              className="glass-card w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8"
             >
-              <h2 className="text-xl font-bold mb-6">Nueva Tarea</h2>
-              <form onSubmit={handleAddTask} className="space-y-4">
+              <h2 className="text-xl sm:text-2xl font-bold mb-8">Nueva Tarea</h2>
+              <form onSubmit={handleAddTask} className="space-y-6">
                 {/* Title with icon */}
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <input
                     type="text"
                     value={taskForm.icon}
                     onChange={(e) => setTaskForm({ ...taskForm, icon: e.target.value })}
                     placeholder="Icon"
-                    className="glass-input w-16 text-center text-xl"
+                    className="glass-input w-20 text-center text-xl"
                   />
                   <input
                     type="text"
@@ -403,11 +403,11 @@ export default function WeeklyOps() {
 
                 {/* Day */}
                 <div>
-                  <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Día</label>
+                  <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Día</label>
                   <select
                     value={taskForm.day}
                     onChange={(e) => setTaskForm({ ...taskForm, day: e.target.value })}
-                    className="glass-input w-full"
+                    className="glass-input w-full py-3"
                   >
                     {weekDays.map((d) => (
                       <option key={d.id} value={d.id}>{d.label}</option>
@@ -417,23 +417,23 @@ export default function WeeklyOps() {
 
                 {/* Responsibles */}
                 <div>
-                  <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Responsables</label>
-                  <div className="flex flex-wrap gap-2">
+                  <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Responsables</label>
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
                     {teamMembers.map((member) => (
                       <button
                         key={member.id}
                         type="button"
                         onClick={() => toggleResponsible(member.id)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                        className={`flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all ${
                           taskForm.responsibles?.includes(member.id)
                             ? `${member.color} text-white`
                             : 'glass hover:bg-white/10'
                         }`}
                       >
-                        <div className={`w-6 h-6 rounded-full ${member.color} flex items-center justify-center text-white text-xs font-bold`}>
+                        <div className={`w-7 h-7 rounded-full ${member.color} flex items-center justify-center text-white text-xs font-bold`}>
                           {member.name[0]}
                         </div>
-                        <span className="text-sm">{member.name.split(' ')[0]}</span>
+                        <span className="text-sm font-medium">{member.name.split(' ')[0]}</span>
                       </button>
                     ))}
                   </div>
@@ -441,14 +441,14 @@ export default function WeeklyOps() {
 
                 {/* Status */}
                 <div>
-                  <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Status</label>
-                  <div className="flex gap-2">
+                  <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Status</label>
+                  <div className="flex gap-2 sm:gap-3">
                     {statusOptions.map((s) => (
                       <button
                         key={s.value}
                         type="button"
                         onClick={() => setTaskForm({ ...taskForm, status: s.value })}
-                        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        className={`flex-1 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                           taskForm.status === s.value
                             ? `${s.color} text-white`
                             : 'glass hover:bg-white/10'
@@ -462,14 +462,14 @@ export default function WeeklyOps() {
 
                 {/* Pressure */}
                 <div>
-                  <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Semáforo Operativo</label>
-                  <div className="flex gap-2">
+                  <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Semáforo Operativo</label>
+                  <div className="flex gap-2 sm:gap-3">
                     {pressureOptions.map((p) => (
                       <button
                         key={p.value}
                         type="button"
                         onClick={() => setTaskForm({ ...taskForm, pressure: p.value })}
-                        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        className={`flex-1 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                           taskForm.pressure === p.value
                             ? `${p.color} text-white`
                             : 'glass hover:bg-white/10'
@@ -483,24 +483,24 @@ export default function WeeklyOps() {
 
                 {/* Due Date */}
                 <div>
-                  <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Fecha límite</label>
+                  <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Fecha límite</label>
                   <input
                     type="date"
                     value={taskForm.dueDate}
                     onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
-                    className="glass-input w-full"
+                    className="glass-input w-full py-3"
                   />
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-4 pt-6">
                   <button
                     type="button"
                     onClick={() => setShowNewTask(false)}
-                    className="flex-1 glass-button"
+                    className="flex-1 glass-button py-3"
                   >
                     Cancelar
                   </button>
-                  <button type="submit" className="flex-1 btn-accent">
+                  <button type="submit" className="flex-1 btn-accent py-3">
                     Crear
                   </button>
                 </div>

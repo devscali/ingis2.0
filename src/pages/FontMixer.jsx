@@ -69,25 +69,27 @@ body, p {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6 sm:space-y-8"
+      className="space-y-8 sm:space-y-10"
     >
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3">
-          <Type className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
-          Font Mixer
-        </h1>
-        <p className="text-white/50 text-sm sm:text-base">Encuentra combinaciones perfectas de tipografias</p>
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
+          <Type className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">Font Mixer</h1>
+          <p className="text-white/50 text-sm sm:text-base mt-1">Encuentra combinaciones perfectas de tipografias</p>
+        </div>
       </div>
 
       {/* Controls */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="glass-card">
-          <label className="block text-xs sm:text-sm text-white/40 uppercase tracking-wider mb-2">Titulos</label>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="glass-card p-5 sm:p-6">
+          <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Titulos</label>
           <select
             value={headingFont}
             onChange={(e) => setHeadingFont(e.target.value)}
-            className="glass-input w-full text-sm sm:text-base"
+            className="glass-input w-full py-3 text-sm sm:text-base"
           >
             {googleFonts.map((font) => (
               <option key={font} value={font}>{font}</option>
@@ -95,12 +97,12 @@ body, p {
           </select>
         </div>
 
-        <div className="glass-card">
-          <label className="block text-xs sm:text-sm text-white/40 uppercase tracking-wider mb-2">Cuerpo</label>
+        <div className="glass-card p-5 sm:p-6">
+          <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Cuerpo</label>
           <select
             value={bodyFont}
             onChange={(e) => setBodyFont(e.target.value)}
-            className="glass-input w-full text-sm sm:text-base"
+            className="glass-input w-full py-3 text-sm sm:text-base"
           >
             {googleFonts.map((font) => (
               <option key={font} value={font}>{font}</option>
@@ -110,24 +112,24 @@ body, p {
 
         <button
           onClick={randomize}
-          className="glass-card flex items-center justify-center gap-2 hover:bg-white/10 transition-colors text-sm sm:text-base"
+          className="glass-card p-5 sm:p-6 flex items-center justify-center gap-3 hover:bg-white/10 transition-colors text-sm sm:text-base font-medium"
         >
-          <Shuffle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
+          <Shuffle className="w-5 h-5 text-orange-500" />
           Aleatorio
         </button>
 
         <button
           onClick={copyCSS}
-          className="btn-accent flex items-center justify-center gap-2 text-sm sm:text-base"
+          className="btn-accent flex items-center justify-center gap-3 text-sm sm:text-base py-5 sm:py-6 rounded-xl"
         >
           {copied ? (
             <>
-              <Check className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Check className="w-5 h-5" />
               Copiado!
             </>
           ) : (
             <>
-              <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Copy className="w-5 h-5" />
               Copiar CSS
             </>
           )}
@@ -135,27 +137,27 @@ body, p {
       </div>
 
       {/* Preview */}
-      <div className="glass-card">
-        <h2 className="text-base sm:text-lg font-bold mb-4 text-white/40">Vista Previa</h2>
+      <div className="glass-card p-6 sm:p-8">
+        <h2 className="text-base sm:text-lg font-bold mb-6 text-white/40">Vista Previa</h2>
 
-        <div className="bg-white rounded-xl p-4 sm:p-6 lg:p-8 text-gray-900">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 lg:p-10 text-gray-900">
           <h1
             style={{ fontFamily: `'${headingFont}', serif` }}
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 text-gray-900"
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-5 sm:mb-6 text-gray-900"
           >
             El veloz murcielago hindu comia feliz cardillo y kiwi
           </h1>
 
           <h2
             style={{ fontFamily: `'${headingFont}', serif` }}
-            className="text-lg sm:text-xl lg:text-2xl font-semibold mb-3 sm:mb-4 text-gray-700"
+            className="text-lg sm:text-xl lg:text-2xl font-semibold mb-5 sm:mb-6 text-gray-700"
           >
             Subtitulo con la tipografia de titulos
           </h2>
 
           <p
             style={{ fontFamily: `'${bodyFont}', sans-serif` }}
-            className="text-sm sm:text-base lg:text-lg text-gray-600 mb-4 leading-relaxed"
+            className="text-sm sm:text-base lg:text-lg text-gray-600 mb-5 leading-relaxed"
           >
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
           </p>
@@ -170,27 +172,27 @@ body, p {
       </div>
 
       {/* Font Info */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        <div className="glass-card">
-          <h3 className="text-sm sm:text-base font-semibold mb-2">Tipografia de Titulos</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        <div className="glass-card p-6 sm:p-8">
+          <h3 className="text-sm sm:text-base font-semibold mb-3 text-white/60">Tipografia de Titulos</h3>
           <p
             style={{ fontFamily: `'${headingFont}', serif` }}
-            className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-500"
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-orange-500 mb-4"
           >
             {headingFont}
           </p>
-          <p className="text-xs sm:text-sm text-white/40 mt-2">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm</p>
+          <p className="text-sm text-white/40">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm</p>
         </div>
 
-        <div className="glass-card">
-          <h3 className="text-sm sm:text-base font-semibold mb-2">Tipografia de Cuerpo</h3>
+        <div className="glass-card p-6 sm:p-8">
+          <h3 className="text-sm sm:text-base font-semibold mb-3 text-white/60">Tipografia de Cuerpo</h3>
           <p
             style={{ fontFamily: `'${bodyFont}', sans-serif` }}
-            className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-500"
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-orange-500 mb-4"
           >
             {bodyFont}
           </p>
-          <p className="text-xs sm:text-sm text-white/40 mt-2">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm</p>
+          <p className="text-sm text-white/40">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm</p>
         </div>
       </div>
     </motion.div>
