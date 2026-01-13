@@ -132,28 +132,28 @@ export default function QualityControl() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6 sm:space-y-8"
+      className="space-y-10 sm:space-y-12"
     >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3">
-            <CheckCircle2 className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
+          <h1 className="text-2xl sm:text-3xl font-bold mb-3 flex items-center gap-3">
+            <CheckCircle2 className="w-8 h-8 text-green-500" />
             Control de Calidad
           </h1>
-          <p className="text-white/50 text-sm sm:text-base">Gestiona la calidad de tus proyectos web</p>
+          <p className="text-white/50">Gestiona la calidad de tus proyectos web</p>
         </div>
         <button
           onClick={() => setShowNewProject(true)}
-          className="btn-accent flex items-center gap-2 self-start text-sm sm:text-base"
+          className="btn-accent flex items-center gap-2 self-start py-3 px-5"
         >
-          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Plus className="w-5 h-5" />
           Nuevo Proyecto
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <StatCard icon={CheckCheck} value={completedProjects} label="Completados" color="green" />
         <StatCard icon={Clock} value={inProgressProjects} label="En Progreso" color="orange" />
         <StatCard icon={AlertCircle} value={pendingProjects} label="Pendientes" color="red" />

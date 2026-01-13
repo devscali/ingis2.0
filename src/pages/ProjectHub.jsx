@@ -219,17 +219,17 @@ export default function ProjectHub() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6 sm:space-y-8"
+      className="space-y-10 sm:space-y-12"
     >
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-lg sm:text-2xl font-bold shadow-lg shadow-purple-500/30">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-lg shadow-purple-500/30">
             P
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold">Project Hub Pro</h1>
-            <p className="text-white/50 text-xs sm:text-base">Gestión de proyectos de clase mundial</p>
+            <h1 className="text-2xl sm:text-3xl font-bold">Project Hub Pro</h1>
+            <p className="text-white/50 mt-1">Gestión de proyectos de clase mundial</p>
           </div>
         </div>
 
@@ -267,19 +267,19 @@ export default function ProjectHub() {
       </div>
 
       {/* Team */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-        <span className="text-xs sm:text-sm text-white/40 uppercase tracking-wider">Equipo</span>
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-5">
+        <span className="text-xs text-white/40 uppercase tracking-widest">Equipo</span>
+        <div className="flex flex-wrap items-center gap-3">
           {teamMembers.map((member) => (
             <div
               key={member.id}
-              className="glass px-2 sm:px-3 py-1.5 sm:py-2 flex items-center gap-2"
+              className="glass px-4 py-3 flex items-center gap-3"
             >
-              <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg ${member.color} flex items-center justify-center text-white text-xs sm:text-sm font-bold`}>
+              <div className={`w-10 h-10 rounded-xl ${member.color} flex items-center justify-center text-white text-sm font-bold`}>
                 {member.name[0]}
               </div>
-              <div className="hidden sm:block">
-                <p className="text-sm font-medium">{member.name}</p>
+              <div>
+                <p className="font-medium">{member.name}</p>
                 <p className="text-xs text-white/40">{member.role}</p>
               </div>
             </div>
@@ -288,50 +288,54 @@ export default function ProjectHub() {
       </div>
 
       {/* Quick Add Form */}
-      <form onSubmit={handleQuickAdd} className="flex flex-wrap gap-2 sm:gap-3">
-        <input
-          type="text"
-          value={quickAdd.title}
-          onChange={(e) => setQuickAdd({ ...quickAdd, title: e.target.value })}
-          placeholder="Nueva tarea..."
-          className="glass-input flex-1 min-w-[200px]"
-        />
-        <input
-          type="text"
-          value={quickAdd.description}
-          onChange={(e) => setQuickAdd({ ...quickAdd, description: e.target.value })}
-          placeholder="Descripción (opcional)"
-          className="glass-input flex-1 min-w-[200px]"
-        />
-        <select
-          value={quickAdd.priority}
-          onChange={(e) => setQuickAdd({ ...quickAdd, priority: e.target.value })}
-          className="glass-input w-32"
-        >
-          {priorityOptions.map((p) => (
-            <option key={p.value} value={p.value}>{p.label}</option>
-          ))}
-        </select>
-        <select
-          value={quickAdd.assignee}
-          onChange={(e) => setQuickAdd({ ...quickAdd, assignee: e.target.value })}
-          className="glass-input w-40"
-        >
-          <option value="">Asignar a...</option>
-          {teamMembers.map((m) => (
-            <option key={m.id} value={m.id}>{m.name}</option>
-          ))}
-        </select>
-        <input
-          type="date"
-          value={quickAdd.dueDate}
-          onChange={(e) => setQuickAdd({ ...quickAdd, dueDate: e.target.value })}
-          className="glass-input w-40"
-        />
-        <button type="submit" className="btn-accent flex items-center gap-2">
-          <Plus className="w-5 h-5" />
-          Agregar
-        </button>
+      <form onSubmit={handleQuickAdd} className="glass-card p-6 sm:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <input
+            type="text"
+            value={quickAdd.title}
+            onChange={(e) => setQuickAdd({ ...quickAdd, title: e.target.value })}
+            placeholder="Nueva tarea..."
+            className="glass-input py-4 lg:col-span-1"
+          />
+          <input
+            type="text"
+            value={quickAdd.description}
+            onChange={(e) => setQuickAdd({ ...quickAdd, description: e.target.value })}
+            placeholder="Descripción (opcional)"
+            className="glass-input py-4 lg:col-span-2"
+          />
+          <select
+            value={quickAdd.priority}
+            onChange={(e) => setQuickAdd({ ...quickAdd, priority: e.target.value })}
+            className="glass-input py-4"
+          >
+            {priorityOptions.map((p) => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </select>
+          <select
+            value={quickAdd.assignee}
+            onChange={(e) => setQuickAdd({ ...quickAdd, assignee: e.target.value })}
+            className="glass-input py-4"
+          >
+            <option value="">Asignar a...</option>
+            {teamMembers.map((m) => (
+              <option key={m.id} value={m.id}>{m.name}</option>
+            ))}
+          </select>
+          <input
+            type="date"
+            value={quickAdd.dueDate}
+            onChange={(e) => setQuickAdd({ ...quickAdd, dueDate: e.target.value })}
+            className="glass-input py-4"
+          />
+        </div>
+        <div className="mt-6">
+          <button type="submit" className="btn-accent flex items-center gap-3 py-4 px-8">
+            <Plus className="w-5 h-5" />
+            Agregar Tarea
+          </button>
+        </div>
       </form>
 
       {/* Kanban Board */}
@@ -466,41 +470,33 @@ export default function ProjectHub() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              className="glass-card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 sm:p-10"
             >
-              <h2 className="text-xl font-bold mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3">
                 {editingTask ? 'Editar Tarea' : 'Nueva Tarea'}
               </h2>
+              {currentProject && (
+                <p className="text-white/50 mb-10">Para: {currentProject.name}</p>
+              )}
 
-              <div className="space-y-4">
+              <div className="space-y-8">
                 <div>
-                  <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Título</label>
-                  <input
-                    type="text"
-                    value={taskForm.title}
-                    onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
-                    className="glass-input w-full"
-                    placeholder="Título de la tarea"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Descripción</label>
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Descripcion</label>
                   <textarea
                     value={taskForm.description}
                     onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
-                    className="glass-input w-full h-24 resize-none"
-                    placeholder="Descripción (opcional)"
+                    className="glass-input w-full h-32 resize-none py-4 px-5"
+                    placeholder="Que hay que hacer?"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Prioridad</label>
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Prioridad</label>
                     <select
                       value={taskForm.priority}
                       onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value })}
-                      className="glass-input w-full"
+                      className="glass-input w-full py-4"
                     >
                       {priorityOptions.map((p) => (
                         <option key={p.value} value={p.value}>{p.label}</option>
@@ -508,95 +504,30 @@ export default function ProjectHub() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Asignado a</label>
-                    <select
-                      value={taskForm.assignee}
-                      onChange={(e) => setTaskForm({ ...taskForm, assignee: e.target.value })}
-                      className="glass-input w-full"
-                    >
-                      <option value="">Sin asignar</option>
-                      {teamMembers.map((m) => (
-                        <option key={m.id} value={m.id}>{m.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Fecha</label>
-                  <input
-                    type="date"
-                    value={taskForm.dueDate}
-                    onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
-                    className="glass-input w-full"
-                  />
-                </div>
-
-                {/* Checklist */}
-                <div>
-                  <label className="block text-sm text-white/40 uppercase tracking-wider mb-2">Checklist</label>
-                  <div className="space-y-2 mb-3">
-                    {taskForm.checklist.length === 0 ? (
-                      <p className="text-white/30 text-sm text-center py-2">Sin items en la lista</p>
-                    ) : (
-                      taskForm.checklist.map((item, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => toggleChecklistItem(index)}
-                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                              item.completed ? 'bg-green-500 border-green-500' : 'border-white/20'
-                            }`}
-                          >
-                            {item.completed && <CheckSquare className="w-3 h-3 text-white" />}
-                          </button>
-                          <span className={`flex-1 ${item.completed ? 'line-through text-white/40' : ''}`}>
-                            {item.text}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => removeChecklistItem(index)}
-                            className="p-1 hover:bg-red-500/20 rounded transition-colors"
-                          >
-                            <X className="w-4 h-4 text-red-400" />
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  <div className="flex gap-2">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Fecha</label>
                     <input
-                      type="text"
-                      value={newChecklistItem}
-                      onChange={(e) => setNewChecklistItem(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addChecklistItem())}
-                      placeholder="Agregar item..."
-                      className="glass-input flex-1"
+                      type="date"
+                      value={taskForm.dueDate}
+                      onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
+                      className="glass-input w-full py-4"
                     />
-                    <button
-                      type="button"
-                      onClick={addChecklistItem}
-                      className="btn-accent px-3"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
                   </div>
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-5 pt-6">
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="flex-1 glass-button"
+                    className="flex-1 glass-button py-4 text-base"
                   >
                     Cancelar
                   </button>
                   <button
                     type="button"
                     onClick={handleSaveTask}
-                    className="flex-1 btn-accent"
+                    className="flex-1 btn-accent py-4 text-base"
                   >
-                    Guardar
+                    Agregar
                   </button>
                 </div>
               </div>
