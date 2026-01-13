@@ -144,14 +144,15 @@ h1, h2, h3, h4, h5, h6 {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
-  padding: 0.875rem 1.125rem;
-  border-radius: 0.75rem;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.875rem;
   color: rgba(255, 255, 255, 0.6);
   transition: all 0.2s ease;
   cursor: pointer;
   text-decoration: none;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
 }
 
 .nav-item:hover {
@@ -163,6 +164,7 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(255, 107, 53, 0.15);
   color: #ff6b35;
   border-left: 3px solid #ff6b35;
+  font-weight: 500;
 }
 
 /* ==================== BADGES ==================== */

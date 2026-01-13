@@ -100,15 +100,15 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
         </button>
 
         {/* Navigation */}
-        <nav className={`flex-1 overflow-y-auto ${isCollapsed ? 'p-2' : 'p-4 sm:p-5'}`}>
+        <nav className={`flex-1 overflow-y-auto ${isCollapsed ? 'p-2' : 'p-5 sm:p-6'}`}>
           {Object.entries(sections).map(([section, items]) => (
-            <div key={section} className={`${isCollapsed ? 'mb-4' : 'mb-6 sm:mb-8'}`}>
+            <div key={section} className={`${isCollapsed ? 'mb-6' : 'mb-8 sm:mb-10'}`}>
               {!isCollapsed && (
-                <p className="px-4 mb-3 text-xs font-semibold text-white/40 uppercase tracking-wider">
+                <p className="px-4 mb-4 text-[11px] font-semibold text-white/40 uppercase tracking-widest">
                   {section}
                 </p>
               )}
-              <div className={`${isCollapsed ? 'space-y-2' : 'space-y-1'}`}>
+              <div className={`${isCollapsed ? 'space-y-3' : 'space-y-2'}`}>
                 {items.map((item) => (
                   <NavLink
                     key={item.path}

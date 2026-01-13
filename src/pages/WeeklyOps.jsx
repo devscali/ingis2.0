@@ -378,36 +378,36 @@ export default function WeeklyOps() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8"
+              className="glass-card w-full max-w-xl max-h-[90vh] overflow-y-auto p-8 sm:p-10"
             >
-              <h2 className="text-xl sm:text-2xl font-bold mb-8">Nueva Tarea</h2>
-              <form onSubmit={handleAddTask} className="space-y-6">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-10">Nueva Tarea</h2>
+              <form onSubmit={handleAddTask} className="space-y-8">
                 {/* Title with icon */}
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   <input
                     type="text"
                     value={taskForm.icon}
                     onChange={(e) => setTaskForm({ ...taskForm, icon: e.target.value })}
                     placeholder="Icon"
-                    className="glass-input w-20 text-center text-xl"
+                    className="glass-input w-24 text-center text-2xl py-4"
                   />
                   <input
                     type="text"
                     value={taskForm.title}
                     onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
                     placeholder="Nombre de la tarea"
-                    className="glass-input flex-1"
+                    className="glass-input flex-1 py-4"
                     autoFocus
                   />
                 </div>
 
                 {/* Day */}
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Día</label>
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Día</label>
                   <select
                     value={taskForm.day}
                     onChange={(e) => setTaskForm({ ...taskForm, day: e.target.value })}
-                    className="glass-input w-full py-3"
+                    className="glass-input w-full py-4"
                   >
                     {weekDays.map((d) => (
                       <option key={d.id} value={d.id}>{d.label}</option>
@@ -417,20 +417,20 @@ export default function WeeklyOps() {
 
                 {/* Responsibles */}
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Responsables</label>
-                  <div className="flex flex-wrap gap-2 sm:gap-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Responsables</label>
+                  <div className="flex flex-wrap gap-3">
                     {teamMembers.map((member) => (
                       <button
                         key={member.id}
                         type="button"
                         onClick={() => toggleResponsible(member.id)}
-                        className={`flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all ${
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           taskForm.responsibles?.includes(member.id)
                             ? `${member.color} text-white`
                             : 'glass hover:bg-white/10'
                         }`}
                       >
-                        <div className={`w-7 h-7 rounded-full ${member.color} flex items-center justify-center text-white text-xs font-bold`}>
+                        <div className={`w-8 h-8 rounded-full ${member.color} flex items-center justify-center text-white text-sm font-bold`}>
                           {member.name[0]}
                         </div>
                         <span className="text-sm font-medium">{member.name.split(' ')[0]}</span>
@@ -441,14 +441,14 @@ export default function WeeklyOps() {
 
                 {/* Status */}
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Status</label>
-                  <div className="flex gap-2 sm:gap-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Status</label>
+                  <div className="flex gap-3">
                     {statusOptions.map((s) => (
                       <button
                         key={s.value}
                         type="button"
                         onClick={() => setTaskForm({ ...taskForm, status: s.value })}
-                        className={`flex-1 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                        className={`flex-1 px-4 py-3.5 rounded-xl text-sm font-medium transition-all ${
                           taskForm.status === s.value
                             ? `${s.color} text-white`
                             : 'glass hover:bg-white/10'
@@ -462,14 +462,14 @@ export default function WeeklyOps() {
 
                 {/* Pressure */}
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Semáforo Operativo</label>
-                  <div className="flex gap-2 sm:gap-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Semáforo Operativo</label>
+                  <div className="flex gap-3">
                     {pressureOptions.map((p) => (
                       <button
                         key={p.value}
                         type="button"
                         onClick={() => setTaskForm({ ...taskForm, pressure: p.value })}
-                        className={`flex-1 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                        className={`flex-1 px-4 py-3.5 rounded-xl text-sm font-medium transition-all ${
                           taskForm.pressure === p.value
                             ? `${p.color} text-white`
                             : 'glass hover:bg-white/10'
@@ -483,24 +483,24 @@ export default function WeeklyOps() {
 
                 {/* Due Date */}
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-wider mb-3">Fecha límite</label>
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Fecha límite</label>
                   <input
                     type="date"
                     value={taskForm.dueDate}
                     onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
-                    className="glass-input w-full py-3"
+                    className="glass-input w-full py-4"
                   />
                 </div>
 
-                <div className="flex gap-4 pt-6">
+                <div className="flex gap-4 pt-8">
                   <button
                     type="button"
                     onClick={() => setShowNewTask(false)}
-                    className="flex-1 glass-button py-3"
+                    className="flex-1 glass-button py-4 text-base"
                   >
                     Cancelar
                   </button>
-                  <button type="submit" className="flex-1 btn-accent py-3">
+                  <button type="submit" className="flex-1 btn-accent py-4 text-base">
                     Crear
                   </button>
                 </div>
