@@ -50,7 +50,7 @@ export default function Layout() {
         </header>
 
         {/* Page Content */}
-        <div className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 lg:pl-16 lg:pr-12 xl:pl-20 xl:pr-16 lg:py-12 pt-20 sm:pt-22 lg:pt-12 min-h-screen max-w-7xl mx-auto">
+        <div className="px-5 py-8 sm:px-8 sm:py-10 lg:pl-12 lg:pr-10 xl:pl-16 xl:pr-12 lg:py-10 pt-24 lg:pt-10 min-h-screen max-w-7xl">
           <Outlet />
         </div>
       </main>

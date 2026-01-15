@@ -6,13 +6,11 @@ import {
   X,
   Calendar,
   CheckSquare,
-  ChevronDown,
   Trash2,
   Edit3,
   Flame,
   Sparkles,
   Search,
-  FolderPlus,
   Zap,
   ArrowRight
 } from 'lucide-react'
@@ -35,35 +33,10 @@ const priorityOptions = [
   { value: 'baja', label: 'Baja', color: 'text-green-400', bg: 'bg-green-500', badge: 'bg-green-500/20 text-green-400 border-green-500/30' },
 ]
 
-// Fire particle effect
-const FireParticle = ({ delay = 0 }) => (
-  <motion.div
-    className="absolute w-1 h-1 rounded-full bg-orange-500"
-    initial={{ opacity: 0, y: 0, scale: 0 }}
-    animate={{
-      opacity: [0, 1, 0],
-      y: [-15, -35],
-      scale: [0, 1, 0],
-      x: [0, Math.random() * 8 - 4]
-    }}
-    transition={{
-      duration: 0.8,
-      delay,
-      repeat: Infinity,
-      repeatDelay: Math.random() * 0.3
-    }}
-  />
-)
-
 export default function ProjectHub() {
-  const [projects, setProjects] = useState([])
-  const [currentProject, setCurrentProject] = useState(null)
   const [tasks, setTasks] = useState([])
   const [showTaskModal, setShowTaskModal] = useState(false)
-  const [showProjectModal, setShowProjectModal] = useState(false)
-  const [showProjectDropdown, setShowProjectDropdown] = useState(false)
   const [editingTask, setEditingTask] = useState(null)
-  const [editingProject, setEditingProject] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
 
   const [taskForm, setTaskForm] = useState({
@@ -73,125 +46,22 @@ export default function ProjectHub() {
     assignee: '',
     dueDate: '',
     column: 'planning',
-    checklist: []
-  })
-
-  const [projectForm, setProjectForm] = useState({
-    name: '',
-    description: '',
-    color: 'bg-purple-500'
   })
 
   const { user } = useAuthStore()
   const { teamMembers } = useSettingsStore()
 
-  // Load projects
+  // Load tasks
   useEffect(() => {
     if (!user?.uid) return
 
-    const q = query(collection(db, 'kanban_projects'), where('userId', '==', user.uid))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const projectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-      setProjects(projectsData)
-      if (projectsData.length > 0 && !currentProject) {
-        setCurrentProject(projectsData[0])
-      }
-    })
-    return () => unsubscribe()
-  }, [user?.uid])
-
-  // Load tasks for current project
-  useEffect(() => {
-    if (!currentProject?.id) return
-
-    const q = query(collection(db, 'kanban_tasks'), where('projectId', '==', currentProject.id))
+    const q = query(collection(db, 'kanban_tasks'), where('userId', '==', user.uid))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const tasksData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       setTasks(tasksData)
     })
     return () => unsubscribe()
-  }, [currentProject?.id])
-
-  // Create default project if none exists
-  useEffect(() => {
-    if (user?.uid && projects.length === 0) {
-      createDefaultProject()
-    }
-  }, [user?.uid, projects.length])
-
-  const createDefaultProject = async () => {
-    const newProject = await addDoc(collection(db, 'kanban_projects'), {
-      userId: user.uid,
-      name: 'Proyecto Principal',
-      description: 'Mi primer proyecto',
-      color: 'bg-purple-500',
-      createdAt: new Date().toISOString()
-    })
-    setCurrentProject({ id: newProject.id, name: 'Proyecto Principal', color: 'bg-purple-500' })
-  }
-
-  // Project CRUD
-  const openNewProjectModal = () => {
-    setEditingProject(null)
-    setProjectForm({ name: '', description: '', color: 'bg-purple-500' })
-    setShowProjectModal(true)
-  }
-
-  const openEditProjectModal = (project) => {
-    setEditingProject(project)
-    setProjectForm({
-      name: project.name || '',
-      description: project.description || '',
-      color: project.color || 'bg-purple-500'
-    })
-    setShowProjectModal(true)
-  }
-
-  const handleSaveProject = async () => {
-    if (!projectForm.name.trim()) return
-
-    if (editingProject) {
-      await updateDoc(doc(db, 'kanban_projects', editingProject.id), {
-        name: projectForm.name,
-        description: projectForm.description,
-        color: projectForm.color,
-        updatedAt: new Date().toISOString()
-      })
-      if (currentProject?.id === editingProject.id) {
-        setCurrentProject({ ...currentProject, ...projectForm })
-      }
-    } else {
-      const newProject = await addDoc(collection(db, 'kanban_projects'), {
-        userId: user.uid,
-        name: projectForm.name,
-        description: projectForm.description,
-        color: projectForm.color,
-        createdAt: new Date().toISOString()
-      })
-      setCurrentProject({ id: newProject.id, ...projectForm })
-    }
-
-    setShowProjectModal(false)
-    setEditingProject(null)
-    setProjectForm({ name: '', description: '', color: 'bg-purple-500' })
-  }
-
-  const handleDeleteProject = async (projectId) => {
-    if (!confirm('¿Eliminar este proyecto y todas sus tareas?')) return
-
-    // Delete all tasks
-    const projectTasks = tasks.filter(t => t.projectId === projectId)
-    for (const task of projectTasks) {
-      await deleteDoc(doc(db, 'kanban_tasks', task.id))
-    }
-
-    await deleteDoc(doc(db, 'kanban_projects', projectId))
-
-    if (currentProject?.id === projectId) {
-      const remaining = projects.filter(p => p.id !== projectId)
-      setCurrentProject(remaining[0] || null)
-    }
-  }
+  }, [user?.uid])
 
   // Task CRUD
   const openNewTaskModal = (column = 'planning') => {
@@ -203,7 +73,6 @@ export default function ProjectHub() {
       assignee: '',
       dueDate: '',
       column,
-      checklist: []
     })
     setShowTaskModal(true)
   }
@@ -217,7 +86,6 @@ export default function ProjectHub() {
       assignee: task.assignee || '',
       dueDate: task.dueDate || '',
       column: task.column || 'planning',
-      checklist: task.checklist || []
     })
     setShowTaskModal(true)
   }
@@ -232,7 +100,7 @@ export default function ProjectHub() {
       })
     } else {
       await addDoc(collection(db, 'kanban_tasks'), {
-        projectId: currentProject.id,
+        userId: user.uid,
         ...taskForm,
         createdAt: new Date().toISOString()
       })
@@ -251,7 +119,6 @@ export default function ProjectHub() {
       assignee: '',
       dueDate: '',
       column: 'planning',
-      checklist: []
     })
   }
 
@@ -279,17 +146,6 @@ export default function ProjectHub() {
 
   const getMember = (id) => teamMembers.find(m => m.id === id)
 
-  const projectColors = [
-    'bg-purple-500',
-    'bg-blue-500',
-    'bg-pink-500',
-    'bg-orange-500',
-    'bg-teal-500',
-    'bg-indigo-500',
-    'bg-rose-500',
-    'bg-cyan-500',
-  ]
-
   const totalTasks = tasks.length
   const completedTasks = tasks.filter(t => t.column === 'completed').length
 
@@ -302,109 +158,25 @@ export default function ProjectHub() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
             <Kanban className="w-7 h-7 text-white" />
-            {/* Fire particles */}
-            <div className="absolute -top-1 left-1/2 -translate-x-1/2">
-              {[0, 0.15, 0.3].map((delay, i) => (
-                <FireParticle key={i} delay={delay} />
-              ))}
-            </div>
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
               Project Hub
               <Flame className="w-5 h-5 text-orange-500 animate-pulse" />
             </h1>
-            <p className="text-white/50">Gestión de proyectos Calidevs style</p>
+            <p className="text-white/50">Tablero Kanban para tus tareas</p>
           </div>
         </div>
 
-        {/* Project Selector */}
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <button
-              onClick={() => setShowProjectDropdown(!showProjectDropdown)}
-              className="bg-dark-700/80 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3 hover:border-white/20 transition-colors min-w-[200px]"
-            >
-              <div className={`w-3 h-3 rounded ${currentProject?.color || 'bg-purple-500'}`} />
-              <span className="flex-1 text-left truncate">{currentProject?.name || 'Seleccionar'}</span>
-              <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${showProjectDropdown ? 'rotate-180' : ''}`} />
-            </button>
-
-            <AnimatePresence>
-              {showProjectDropdown && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 top-full mt-2 w-72 bg-dark-800 border border-white/10 rounded-xl overflow-hidden z-50 shadow-2xl"
-                >
-                  {projects.map((project) => (
-                    <div
-                      key={project.id}
-                      className={`flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors cursor-pointer group ${
-                        currentProject?.id === project.id ? 'bg-white/5' : ''
-                      }`}
-                    >
-                      <div
-                        className="flex-1 flex items-center gap-3"
-                        onClick={() => {
-                          setCurrentProject(project)
-                          setShowProjectDropdown(false)
-                        }}
-                      >
-                        <div className={`w-3 h-3 rounded ${project.color}`} />
-                        <span className="truncate">{project.name}</span>
-                      </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            openEditProjectModal(project)
-                            setShowProjectDropdown(false)
-                          }}
-                          className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
-                        >
-                          <Edit3 className="w-3.5 h-3.5 text-white/50" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeleteProject(project.id)
-                          }}
-                          className="p-1.5 rounded-lg hover:bg-red-500/20 transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 text-red-400" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="border-t border-white/5">
-                    <button
-                      onClick={() => {
-                        openNewProjectModal()
-                        setShowProjectDropdown(false)
-                      }}
-                      className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/5 transition-colors text-purple-400"
-                    >
-                      <FolderPlus className="w-4 h-4" />
-                      Nuevo Proyecto
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <button
-            onClick={() => openNewTaskModal()}
-            className="btn-accent flex items-center gap-2 py-3 px-5"
-          >
-            <Plus className="w-5 h-5" />
-            Nueva Tarea
-          </button>
-        </div>
+        <button
+          onClick={() => openNewTaskModal()}
+          className="btn-accent flex items-center gap-2 py-3 px-5 self-start"
+        >
+          <Plus className="w-5 h-5" />
+          Nueva Tarea
+        </button>
       </div>
 
       {/* Stats & Search */}
@@ -544,15 +316,6 @@ export default function ProjectHub() {
                           )}
                         </div>
 
-                        {task.checklist?.length > 0 && (
-                          <div className="mt-3 pt-3 border-t border-white/5">
-                            <div className="flex items-center gap-2 text-xs text-white/40">
-                              <CheckSquare className="w-3 h-3" />
-                              {task.checklist.filter(c => c.completed).length}/{task.checklist.length} completadas
-                            </div>
-                          </div>
-                        )}
-
                         {/* Move buttons */}
                         <div className="flex gap-1 mt-3 pt-3 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
                           {defaultColumns.filter(c => c.id !== column.id).map((col) => (
@@ -579,107 +342,6 @@ export default function ProjectHub() {
         })}
       </div>
 
-      {/* Project Modal */}
-      <AnimatePresence>
-        {showProjectModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowProjectModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-lg p-8"
-            >
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                    {editingProject ? <Edit3 className="w-5 h-5 text-purple-400" /> : <FolderPlus className="w-5 h-5 text-purple-400" />}
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">{editingProject ? 'Editar Proyecto' : 'Nuevo Proyecto'}</h2>
-                    <p className="text-sm text-white/50">Project Hub</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowProjectModal(false)}
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  <X className="w-5 h-5 text-white/50" />
-                </button>
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
-                    Nombre del Proyecto *
-                  </label>
-                  <input
-                    type="text"
-                    value={projectForm.name}
-                    onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
-                    placeholder="Mi Proyecto"
-                    className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 focus:border-purple-500/50 focus:outline-none transition-colors"
-                    autoFocus
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
-                    Descripción
-                  </label>
-                  <textarea
-                    value={projectForm.description}
-                    onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
-                    placeholder="Descripción del proyecto..."
-                    rows={3}
-                    className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 focus:border-purple-500/50 focus:outline-none transition-colors resize-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
-                    Color
-                  </label>
-                  <div className="flex gap-2">
-                    {projectColors.map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => setProjectForm({ ...projectForm, color })}
-                        className={`w-10 h-10 rounded-xl ${color} transition-all ${
-                          projectForm.color === color ? 'ring-2 ring-white ring-offset-2 ring-offset-dark-800 scale-110' : 'opacity-60 hover:opacity-100'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex gap-4 pt-4">
-                  <button
-                    onClick={() => setShowProjectModal(false)}
-                    className="flex-1 bg-dark-700 border border-white/10 rounded-xl py-3.5 font-medium hover:bg-white/5 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleSaveProject}
-                    className="flex-1 bg-purple-500 hover:bg-purple-600 rounded-xl py-3.5 font-medium transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Flame className="w-4 h-4" />
-                    {editingProject ? 'Guardar' : 'Crear Proyecto'}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Task Modal */}
       <AnimatePresence>
         {showTaskModal && (
@@ -705,7 +367,7 @@ export default function ProjectHub() {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold">{editingTask ? 'Editar Tarea' : 'Nueva Tarea'}</h2>
-                    <p className="text-sm text-white/50">{currentProject?.name}</p>
+                    <p className="text-sm text-white/50">Project Hub</p>
                   </div>
                 </div>
                 <button
