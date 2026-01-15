@@ -75,6 +75,38 @@ export const useTasksStore = create((set, get) => ({
     })
   },
 
+  // Update a specific task
+  updateTask: async (userId, sessionId, taskIndex, updatedTaskData) => {
+    const { sessions } = get()
+    const session = sessions.find(s => s.id === sessionId)
+    if (!session) return
+
+    const updatedTasks = [...session.tasks]
+    updatedTasks[taskIndex] = { ...updatedTasks[taskIndex], ...updatedTaskData }
+
+    await updateDoc(doc(db, `users/${userId}/sessions`, sessionId), {
+      tasks: updatedTasks
+    })
+  },
+
+  // Delete a specific task
+  deleteTask: async (userId, sessionId, taskIndex) => {
+    const { sessions } = get()
+    const session = sessions.find(s => s.id === sessionId)
+    if (!session) return
+
+    const updatedTasks = session.tasks.filter((_, idx) => idx !== taskIndex)
+
+    if (updatedTasks.length === 0) {
+      // If no tasks left, delete the entire session
+      await deleteDoc(doc(db, `users/${userId}/sessions`, sessionId))
+    } else {
+      await updateDoc(doc(db, `users/${userId}/sessions`, sessionId), {
+        tasks: updatedTasks
+      })
+    }
+  },
+
   // Delete session
   deleteSession: async (userId, sessionId) => {
     await deleteDoc(doc(db, `users/${userId}/sessions`, sessionId))

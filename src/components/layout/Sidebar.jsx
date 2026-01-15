@@ -57,12 +57,13 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
       {/* Sidebar */}
       <aside
         className={`
-          fixed lg:sticky top-0 left-0 h-screen z-50
+          fixed lg:sticky top-0 left-0 h-screen h-[100dvh] z-50
           glass-sidebar flex flex-col
           transition-all duration-300 ease-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
-          ${isCollapsed ? 'w-[80px]' : 'w-[260px] sm:w-[280px]'}
+          ${isCollapsed ? 'w-[80px]' : 'w-[280px] xs:w-[300px] sm:w-[280px]'}
+          safe-top safe-bottom
         `}
       >
         {/* Header */}

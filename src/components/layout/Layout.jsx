@@ -35,11 +35,11 @@ export default function Layout() {
       {/* Main Content */}
       <main className="flex-1">
         {/* Mobile Header */}
-        <header className="lg:hidden fixed top-0 left-0 right-0 z-30 glass-sidebar p-4">
-          <div className="flex items-center gap-4">
+        <header className="lg:hidden fixed top-0 left-0 right-0 z-30 glass-sidebar px-4 py-3 safe-top">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+              className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors active:scale-95"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -50,7 +50,7 @@ export default function Layout() {
         </header>
 
         {/* Page Content */}
-        <div className="p-6 sm:p-10 lg:pl-20 lg:pr-16 xl:pl-28 xl:pr-24 lg:py-14 pt-24 lg:pt-14 min-h-screen max-w-7xl mx-auto">
+        <div className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 lg:pl-16 lg:pr-12 xl:pl-20 xl:pr-16 lg:py-12 pt-20 sm:pt-22 lg:pt-12 min-h-screen max-w-7xl mx-auto">
           <Outlet />
         </div>
       </main>

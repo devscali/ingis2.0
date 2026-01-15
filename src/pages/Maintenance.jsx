@@ -185,114 +185,117 @@ export default function Maintenance() {
       className="space-y-10 sm:space-y-12"
     >
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Planes de Mantenimiento</h1>
-          <p className="text-white/50">Gestiona tus clientes y sus pendientes</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">Planes de Mantenimiento</h1>
+          <p className="text-white/50 text-sm sm:text-base">Gestiona tus clientes y sus pendientes</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <button
-            className="glass-button px-4 py-3 flex items-center gap-2"
+            className="glass-button px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2 text-sm"
           >
             <Filter className="w-4 h-4" />
-            Inactivos
+            <span className="hidden xs:inline">Inactivos</span>
           </button>
           <button
             onClick={() => setShowNewClient(true)}
-            className="btn-accent flex items-center gap-2 py-3 px-5"
+            className="btn-accent flex items-center gap-2 py-2 px-3 sm:py-3 sm:px-5 text-sm sm:text-base"
           >
-            <Plus className="w-5 h-5" />
-            Agregar Cliente
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden xs:inline">Agregar</span> Cliente
           </button>
         </div>
       </div>
 
       {/* Search and Filters Bar */}
-      <div className="glass-card p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+      <div className="glass-card p-3 sm:p-4 md:p-6">
+        <div className="flex flex-col gap-3 sm:gap-4">
+          {/* Search - always full width on mobile */}
+          <div className="relative">
+            <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-white/30" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar clientes..."
-              className="glass-input w-full pl-12 py-3"
+              className="glass-input w-full pl-10 sm:pl-12 py-2.5 sm:py-3 text-sm sm:text-base"
             />
           </div>
 
-          {/* Status Filter */}
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="glass-input py-3 px-4 min-w-[160px]"
-          >
-            <option value="all">Todos</option>
-            <option value="active">Activos</option>
-            <option value="inactive">Inactivos</option>
-            <option value="pending">Pendientes</option>
-          </select>
+          {/* Filters row */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            {/* Status Filter */}
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="glass-input py-2 sm:py-3 px-3 sm:px-4 text-sm flex-1 min-w-[120px] sm:min-w-[160px] sm:flex-none"
+            >
+              <option value="all">Todos</option>
+              <option value="active">Activos</option>
+              <option value="inactive">Inactivos</option>
+              <option value="pending">Pendientes</option>
+            </select>
 
-          {/* View Toggle */}
-          <div className="flex items-center gap-1 glass rounded-xl p-1">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-white/50 hover:text-white'}`}
-            >
-              <LayoutGrid className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-2.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-white/50 hover:text-white'}`}
-            >
-              <List className="w-5 h-5" />
+            {/* View Toggle */}
+            <div className="flex items-center gap-1 glass rounded-xl p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 sm:p-2.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-white/50 hover:text-white'}`}
+              >
+                <LayoutGrid className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 sm:p-2.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-white/50 hover:text-white'}`}
+              >
+                <List className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            </div>
+
+            {/* Refresh */}
+            <button className="glass p-2 sm:p-3 rounded-xl hover:bg-white/10 transition-colors active:scale-95">
+              <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 text-white/50" />
             </button>
           </div>
-
-          {/* Refresh */}
-          <button className="glass p-3 rounded-xl hover:bg-white/10 transition-colors">
-            <RefreshCw className="w-5 h-5 text-white/50" />
-          </button>
         </div>
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-        <div className="glass-card p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-            <Building2 className="w-6 h-6 text-blue-400" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+        <div className="glass-card p-3 sm:p-4 md:p-5 flex items-center gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+            <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
           </div>
-          <div>
-            <p className="text-2xl font-bold">{clients.length}</p>
-            <p className="text-white/50 text-sm">Clientes</p>
-          </div>
-        </div>
-        <div className="glass-card p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-            <CheckCircle2 className="w-6 h-6 text-emerald-400" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold">{clients.filter(c => c.status === 'active').length}</p>
-            <p className="text-white/50 text-sm">Activos</p>
+          <div className="min-w-0">
+            <p className="text-xl sm:text-2xl font-bold">{clients.length}</p>
+            <p className="text-white/50 text-xs sm:text-sm truncate">Clientes</p>
           </div>
         </div>
-        <div className="glass-card p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
-            <Clock className="w-6 h-6 text-orange-400" />
+        <div className="glass-card p-3 sm:p-4 md:p-5 flex items-center gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
           </div>
-          <div>
-            <p className="text-2xl font-bold">{totalPending}</p>
-            <p className="text-white/50 text-sm">Pendientes</p>
+          <div className="min-w-0">
+            <p className="text-xl sm:text-2xl font-bold">{clients.filter(c => c.status === 'active').length}</p>
+            <p className="text-white/50 text-xs sm:text-sm truncate">Activos</p>
           </div>
         </div>
-        <div className="glass-card p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center">
-            <AlertCircle className="w-6 h-6 text-red-400" />
+        <div className="glass-card p-3 sm:p-4 md:p-5 flex items-center gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+            <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
           </div>
-          <div>
-            <p className="text-2xl font-bold">{highPriority}</p>
-            <p className="text-white/50 text-sm">Urgentes</p>
+          <div className="min-w-0">
+            <p className="text-xl sm:text-2xl font-bold">{totalPending}</p>
+            <p className="text-white/50 text-xs sm:text-sm truncate">Pendientes</p>
+          </div>
+        </div>
+        <div className="glass-card p-3 sm:p-4 md:p-5 flex items-center gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0">
+            <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-400" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xl sm:text-2xl font-bold">{highPriority}</p>
+            <p className="text-white/50 text-xs sm:text-sm truncate">Urgentes</p>
           </div>
         </div>
       </div>
@@ -529,23 +532,23 @@ export default function Maintenance() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto"
             onClick={() => setShowNewClient(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card w-full max-w-xl p-8 sm:p-10"
+              className="glass-card w-full max-w-xl p-5 sm:p-8 md:p-10 my-4 sm:my-0"
             >
-              <h2 className="text-2xl font-bold mb-2">Agregar Cliente</h2>
-              <p className="text-white/50 mb-10">Completa la informacion del nuevo cliente</p>
+              <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">Agregar Cliente</h2>
+              <p className="text-white/50 text-sm sm:text-base mb-6 sm:mb-10">Completa la informacion del nuevo cliente</p>
 
-              <form onSubmit={handleAddClient} className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <form onSubmit={handleAddClient} className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="sm:col-span-2">
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
                       Nombre de la Empresa *
                     </label>
                     <input
@@ -553,14 +556,14 @@ export default function Maintenance() {
                       value={clientForm.name}
                       onChange={(e) => setClientForm({ ...clientForm, name: e.target.value })}
                       placeholder="Ej: Empresa ABC"
-                      className="glass-input w-full py-4"
+                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
                       required
                       autoFocus
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
                       Contacto
                     </label>
                     <input
@@ -568,12 +571,12 @@ export default function Maintenance() {
                       value={clientForm.contact}
                       onChange={(e) => setClientForm({ ...clientForm, contact: e.target.value })}
                       placeholder="Nombre del contacto"
-                      className="glass-input w-full py-4"
+                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
                       Ubicacion
                     </label>
                     <input
@@ -581,12 +584,12 @@ export default function Maintenance() {
                       value={clientForm.location}
                       onChange={(e) => setClientForm({ ...clientForm, location: e.target.value })}
                       placeholder="Ciudad o zona"
-                      className="glass-input w-full py-4"
+                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
                       Email
                     </label>
                     <input
@@ -594,12 +597,12 @@ export default function Maintenance() {
                       value={clientForm.email}
                       onChange={(e) => setClientForm({ ...clientForm, email: e.target.value })}
                       placeholder="correo@empresa.com"
-                      className="glass-input w-full py-4"
+                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
                       Telefono
                     </label>
                     <input
@@ -607,15 +610,15 @@ export default function Maintenance() {
                       value={clientForm.phone}
                       onChange={(e) => setClientForm({ ...clientForm, phone: e.target.value })}
                       placeholder="(000) 000-0000"
-                      className="glass-input w-full py-4"
+                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
                     />
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
                       Estado
                     </label>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 sm:gap-3">
                       {statusOptions.map((status) => (
                         <button
                           key={status.value}
@@ -634,16 +637,16 @@ export default function Maintenance() {
                   </div>
                 </div>
 
-                <div className="flex gap-4 pt-6">
+                <div className="flex gap-3 sm:gap-4 pt-4 sm:pt-6">
                   <button
                     type="button"
                     onClick={() => setShowNewClient(false)}
-                    className="flex-1 glass-button py-4 text-base"
+                    className="flex-1 glass-button py-3 sm:py-4 text-sm sm:text-base"
                   >
                     Cancelar
                   </button>
-                  <button type="submit" className="flex-1 btn-accent py-4 text-base">
-                    Agregar Cliente
+                  <button type="submit" className="flex-1 btn-accent py-3 sm:py-4 text-sm sm:text-base">
+                    Agregar
                   </button>
                 </div>
               </form>
@@ -659,39 +662,39 @@ export default function Maintenance() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto"
             onClick={() => {
               setShowNewTask(false)
               setSelectedClient(null)
             }}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card w-full max-w-xl p-8 sm:p-10"
+              className="glass-card w-full max-w-xl p-5 sm:p-8 md:p-10 my-4 sm:my-0"
             >
-              <h2 className="text-2xl font-bold mb-2">Nueva Tarea</h2>
-              <p className="text-white/50 mb-10">Para: {selectedClient.name}</p>
+              <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">Nueva Tarea</h2>
+              <p className="text-white/50 text-sm sm:text-base mb-6 sm:mb-10">Para: {selectedClient.name}</p>
 
-              <form onSubmit={handleAddTask} className="space-y-8">
+              <form onSubmit={handleAddTask} className="space-y-5 sm:space-y-8">
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-4">
                     Descripcion
                   </label>
                   <textarea
                     value={taskForm.description}
                     onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
                     placeholder="Que hay que hacer?"
-                    className="glass-input w-full h-32 resize-none py-4 px-5"
+                    className="glass-input w-full h-24 sm:h-32 resize-none py-3 sm:py-4 px-4 sm:px-5 text-sm sm:text-base"
                     autoFocus
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-4">
                       Prioridad
                     </label>
                     <div className="flex gap-2">
@@ -712,31 +715,31 @@ export default function Maintenance() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-4">
                       Fecha Limite
                     </label>
                     <input
                       type="date"
                       value={taskForm.dueDate}
                       onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
-                      className="glass-input w-full py-4"
+                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
                     />
                   </div>
                 </div>
 
-                <div className="flex gap-4 pt-6">
+                <div className="flex gap-3 sm:gap-4 pt-4 sm:pt-6">
                   <button
                     type="button"
                     onClick={() => {
                       setShowNewTask(false)
                       setSelectedClient(null)
                     }}
-                    className="flex-1 glass-button py-4 text-base"
+                    className="flex-1 glass-button py-3 sm:py-4 text-sm sm:text-base"
                   >
                     Cancelar
                   </button>
-                  <button type="submit" className="flex-1 btn-accent py-4 text-base">
-                    Agregar Tarea
+                  <button type="submit" className="flex-1 btn-accent py-3 sm:py-4 text-sm sm:text-base">
+                    Agregar
                   </button>
                 </div>
               </form>
