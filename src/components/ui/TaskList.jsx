@@ -55,7 +55,7 @@ export function TaskList({ tasks, onToggle, showCompleted = false, viewMode = 'l
 
   if (tasks.length === 0) {
     return (
-      <div className="glass-card text-center py-8 sm:py-12">
+      <div className="glass-card text-center py-12 sm:py-16">
         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-3 sm:mb-4">
           <ClipboardList className="w-6 h-6 sm:w-8 sm:h-8 text-white/30" />
         </div>
@@ -166,7 +166,7 @@ function EditTaskModal({ task, onClose, onSave, onChange, toggleResponsible }) {
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="glass-card w-full max-w-lg p-5 sm:p-8 my-4 sm:my-0"
+          className="glass-card w-full max-w-lg p-6 sm:p-8 my-4 sm:my-0"
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">

@@ -26,10 +26,10 @@ export default function Dashboard() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-8"
+      className="space-y-6 sm:space-y-8"
     >
       {/* Header */}
-      <div className="mb-8">
+      <div>
         <h1 className="text-2xl sm:text-3xl font-bold mb-3">
           Hola, <span className="text-orange-500">{user?.displayName || 'Usuario'}</span>
         </h1>
@@ -37,7 +37,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         <StatCard icon={ClipboardList} value={activeTasks} label="Tareas Pendientes" color="orange" />
         <StatCard icon={CheckCircle2} value="0" label="Proyectos QC" color="green" />
         <StatCard icon={Flame} value="3" label="Módulos Activos" color="purple" />

@@ -184,31 +184,60 @@ ${noteText}`
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-card max-w-2xl"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6"
         >
-          <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
-            <FileEdit className="w-5 h-5 text-orange-500" />
-            Nueva Nota
-          </h2>
-          <textarea
-            value={noteText}
-            onChange={(e) => setNoteText(e.target.value)}
-            placeholder={`Escribe tus pendientes aquí...
+          {/* Input Section */}
+          <div className="bg-dark-700/80 border border-white/5 rounded-2xl p-5 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 flex items-center gap-2">
+              <FileEdit className="w-5 h-5 text-orange-500" />
+              Nueva Nota
+            </h2>
+            <textarea
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              placeholder={`Escribe tus pendientes aquí...
 
 Ejemplo:
 - Llamar a Juan del proyecto X urgente para mañana
 - Revisar el presupuesto de María antes del viernes
 - Comprar regalo para cumpleaños de mamá`}
-            className="glass-input w-full h-40 sm:h-48 resize-none mb-3 sm:mb-4 text-sm sm:text-base"
-          />
-          <button
-            onClick={handleProcess}
-            disabled={processing || !noteText.trim()}
-            className="btn-accent flex items-center gap-2 disabled:opacity-50 text-sm sm:text-base w-full sm:w-auto justify-center"
-          >
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
-            {processing ? 'Procesando...' : 'Procesar con IA'}
-          </button>
+              className="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none transition-colors resize-none h-64 lg:h-80 text-sm sm:text-base"
+            />
+            <button
+              onClick={handleProcess}
+              disabled={processing || !noteText.trim()}
+              className="btn-accent flex items-center gap-2 disabled:opacity-50 text-sm sm:text-base w-full justify-center mt-4"
+            >
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+              {processing ? 'Procesando...' : 'Procesar con IA'}
+            </button>
+          </div>
+
+          {/* Tips Section */}
+          <div className="bg-dark-700/80 border border-white/5 rounded-2xl p-5 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-orange-500" />
+              Tips para mejores resultados
+            </h2>
+            <div className="space-y-4">
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h3 className="font-semibold text-orange-400 mb-2">📝 Sé específico</h3>
+                <p className="text-white/50 text-sm">Incluye fechas, nombres y detalles del proyecto.</p>
+              </div>
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h3 className="font-semibold text-orange-400 mb-2">⏰ Menciona urgencia</h3>
+                <p className="text-white/50 text-sm">Usa palabras como "urgente", "para mañana", "antes del viernes".</p>
+              </div>
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h3 className="font-semibold text-orange-400 mb-2">👥 Asigna responsables</h3>
+                <p className="text-white/50 text-sm">Menciona quién debe hacer cada tarea.</p>
+              </div>
+              <div className="bg-dark-800/50 rounded-xl p-4">
+                <h3 className="font-semibold text-orange-400 mb-2">🏢 Indica el cliente</h3>
+                <p className="text-white/50 text-sm">Menciona el nombre del cliente o proyecto.</p>
+              </div>
+            </div>
+          </div>
         </motion.div>
       )}
 
@@ -276,7 +305,7 @@ Ejemplo:
             )
           })}
           {!teamMembers.some(m => activeTasks.some(t => t.responsibles?.includes(m))) && (
-            <div className="glass-card text-center py-12">
+            <div className="glass-card text-center py-12 sm:py-16">
               <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-white/30" />
               </div>

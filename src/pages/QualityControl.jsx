@@ -223,7 +223,7 @@ export default function QualityControl() {
       </div>
 
       {/* Stats - Clean flat style */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
         <div className="bg-dark-700/80 border border-white/5 rounded-xl p-5 flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
             <CheckCheck className="w-6 h-6 text-emerald-400" />
@@ -297,7 +297,7 @@ export default function QualityControl() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-lg p-8"
+              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-lg p-6 sm:p-8"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
@@ -319,7 +319,7 @@ export default function QualityControl() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                     Nombre del Proyecto *
                   </label>
                   <input
@@ -333,7 +333,7 @@ export default function QualityControl() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                     URL del Sitio *
                   </label>
                   <input
@@ -346,7 +346,7 @@ export default function QualityControl() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                     Descripción
                   </label>
                   <textarea
@@ -388,7 +388,7 @@ export default function QualityControl() {
 
       {/* Projects Display */}
       {filteredProjects.length === 0 ? (
-        <div className="bg-dark-700/80 border border-white/5 rounded-xl text-center py-16">
+        <div className="bg-dark-700/80 border border-white/5 rounded-xl text-center py-12 sm:py-16">
           <div className="w-20 h-20 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-6 relative">
             <Globe className="w-10 h-10 text-emerald-400" />
             <Flame className="w-5 h-5 text-orange-500 absolute -top-1 -right-1 animate-pulse" />
@@ -604,7 +604,7 @@ export default function QualityControl() {
                 </div>
               </div>
             ) : (
-              <div className="bg-dark-700/80 border border-white/5 rounded-xl text-center py-16">
+              <div className="bg-dark-700/80 border border-white/5 rounded-xl text-center py-12 sm:py-16">
                 <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
                   <Info className="w-8 h-8 text-white/30" />
                 </div>

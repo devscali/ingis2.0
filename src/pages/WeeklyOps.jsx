@@ -206,10 +206,10 @@ export default function WeeklyOps() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6"
+      className="space-y-6 sm:space-y-8"
     >
       {/* Header - Clean and minimal */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-white">Weekly Operations</h1>
           <p className="text-sm text-white/40 mt-2">{currentWeek?.name || 'Esta semana'}</p>

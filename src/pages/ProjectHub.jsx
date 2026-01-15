@@ -181,7 +181,7 @@ export default function ProjectHub() {
 
       {/* Stats & Search */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex gap-4 flex-1">
+        <div className="flex gap-4 sm:gap-5 flex-1">
           <div className="bg-dark-700/80 border border-white/5 rounded-xl p-4 flex items-center gap-3 flex-1">
             <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
               <Kanban className="w-5 h-5 text-purple-400" />
@@ -357,7 +357,7 @@ export default function ProjectHub() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8"
+              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
@@ -380,7 +380,7 @@ export default function ProjectHub() {
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                     Título *
                   </label>
                   <input
@@ -394,7 +394,7 @@ export default function ProjectHub() {
                 </div>
 
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                     Descripción
                   </label>
                   <textarea
@@ -408,7 +408,7 @@ export default function ProjectHub() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                       Prioridad
                     </label>
                     <div className="flex gap-2">
@@ -430,7 +430,7 @@ export default function ProjectHub() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                       Columna
                     </label>
                     <select
@@ -445,7 +445,7 @@ export default function ProjectHub() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                       Asignar a
                     </label>
                     <select
@@ -461,7 +461,7 @@ export default function ProjectHub() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                       Fecha límite
                     </label>
                     <input

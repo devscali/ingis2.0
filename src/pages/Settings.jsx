@@ -68,10 +68,10 @@ export default function Settings() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6 max-w-3xl"
+      className="space-y-6 sm:space-y-8 max-w-3xl"
     >
       {/* Header */}
-      <div className="mb-8">
+      <div>
         <h1 className="text-2xl sm:text-3xl font-bold mb-3 flex items-center gap-4">
           <SettingsIcon className="w-7 h-7 sm:w-8 sm:h-8 text-white/50" />
           Configuración

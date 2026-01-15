@@ -314,7 +314,7 @@ export default function Maintenance() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         <div className="bg-dark-700/80 border border-white/5 rounded-xl p-4 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
             <Building2 className="w-5 h-5 text-blue-400" />
@@ -394,7 +394,7 @@ export default function Maintenance() {
 
       {/* Clients Display */}
       {filteredClients.length === 0 ? (
-        <div className="bg-dark-700/80 border border-white/5 rounded-xl text-center py-16">
+        <div className="bg-dark-700/80 border border-white/5 rounded-xl text-center py-12 sm:py-16">
           <div className="w-20 h-20 rounded-2xl bg-blue-500/10 flex items-center justify-center mx-auto mb-6 relative">
             <Building2 className="w-10 h-10 text-blue-400" />
             <Flame className="w-5 h-5 text-orange-500 absolute -top-1 -right-1 animate-pulse" />
@@ -631,7 +631,7 @@ export default function Maintenance() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-8"
+              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 sm:p-8"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
@@ -654,7 +654,7 @@ export default function Maintenance() {
 
               <form onSubmit={handleSaveClient} className="space-y-6">
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                     Nombre de la Empresa *
                   </label>
                   <input
@@ -670,7 +670,7 @@ export default function Maintenance() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                       Contacto
                     </label>
                     <input
@@ -682,7 +682,7 @@ export default function Maintenance() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                       Ubicación
                     </label>
                     <input
@@ -694,7 +694,7 @@ export default function Maintenance() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                       Email
                     </label>
                     <input
@@ -706,7 +706,7 @@ export default function Maintenance() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                       Teléfono
                     </label>
                     <input
@@ -720,7 +720,7 @@ export default function Maintenance() {
                 </div>
 
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                     Notas
                   </label>
                   <textarea
@@ -733,7 +733,7 @@ export default function Maintenance() {
                 </div>
 
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                     Estado
                   </label>
                   <div className="flex gap-2">
@@ -795,7 +795,7 @@ export default function Maintenance() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-lg p-8"
+              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-lg p-6 sm:p-8"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
@@ -822,7 +822,7 @@ export default function Maintenance() {
 
               <form onSubmit={handleSaveTask} className="space-y-6">
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                     Descripción *
                   </label>
                   <textarea
@@ -837,7 +837,7 @@ export default function Maintenance() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                       Prioridad
                     </label>
                     <div className="flex gap-2">
@@ -858,7 +858,7 @@ export default function Maintenance() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2">
                       Fecha Límite
                     </label>
                     <input
