@@ -913,31 +913,29 @@ function FireSplash({
       }
     }
 
-    // Mouse/touch handlers for interactive mode
+    // Mouse/touch handlers - attached to window for global tracking
     function handleMouseMove(e) {
-      const rect = canvas.getBoundingClientRect();
       let pointer = pointers[0];
-      let posX = scaleByPixelRatio(e.clientX - rect.left);
-      let posY = scaleByPixelRatio(e.clientY - rect.top);
+      let posX = scaleByPixelRatio(e.clientX);
+      let posY = scaleByPixelRatio(e.clientY);
       let color = generateFireColor();
       updatePointerMoveData(pointer, posX, posY, color);
     }
 
     function handleTouchMove(e) {
-      e.preventDefault();
-      const rect = canvas.getBoundingClientRect();
-      const touches = e.targetTouches;
+      const touches = e.touches;
       let pointer = pointers[0];
       for (let i = 0; i < touches.length; i++) {
-        let posX = scaleByPixelRatio(touches[i].clientX - rect.left);
-        let posY = scaleByPixelRatio(touches[i].clientY - rect.top);
+        let posX = scaleByPixelRatio(touches[i].clientX);
+        let posY = scaleByPixelRatio(touches[i].clientY);
         let color = generateFireColor();
         updatePointerMoveData(pointer, posX, posY, color);
       }
     }
 
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    // Attach to window for global mouse tracking
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
 
     // Start auto splat interval
     if (AUTO_SPLAT) {
@@ -957,8 +955,8 @@ function FireSplash({
         clearInterval(autoSplatRef.current);
       }
 
-      canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleTouchMove);
     };
   }, [AUTO_SPLAT, AUTO_SPLAT_INTERVAL, CURL, DENSITY_DISSIPATION, DYE_RESOLUTION, PRESSURE, PRESSURE_ITERATIONS, SHADING, SIM_RESOLUTION, SPLAT_FORCE, SPLAT_RADIUS, VELOCITY_DISSIPATION]);
 

@@ -6,6 +6,9 @@ import { useTasksStore } from './store/tasksStore'
 // Layout
 import Layout from './components/layout/Layout'
 
+// Fire Effects
+import FireSplash from './components/ui/FireSplash'
+
 // Pages
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
@@ -59,28 +62,42 @@ function App() {
   }, [user, subscribeToSessions, unsubscribeFromSessions])
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Dashboard />} />
-          <Route path="torch" element={<TorchAI />} />
-          <Route path="quality" element={<QualityControl />} />
-          <Route path="projects" element={<ProjectHub />} />
-          <Route path="maintenance" element={<Maintenance />} />
-          <Route path="ops" element={<WeeklyOps />} />
-          <Route path="fonts" element={<FontMixer />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <>
+      {/* Fire cursor effect - follows mouse globally */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 9999, opacity: 0.7 }}>
+        <FireSplash
+          SPLAT_RADIUS={0.25}
+          SPLAT_FORCE={6000}
+          CURL={25}
+          DENSITY_DISSIPATION={2}
+          VELOCITY_DISSIPATION={1.5}
+          AUTO_SPLAT={false}
+        />
+      </div>
+
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="torch" element={<TorchAI />} />
+            <Route path="quality" element={<QualityControl />} />
+            <Route path="projects" element={<ProjectHub />} />
+            <Route path="maintenance" element={<Maintenance />} />
+            <Route path="ops" element={<WeeklyOps />} />
+            <Route path="fonts" element={<FontMixer />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </>
   )
 }
 

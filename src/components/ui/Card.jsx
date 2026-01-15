@@ -1,6 +1,23 @@
 import { motion } from 'framer-motion'
+import FireCard from './FireCard'
 
-export function Card({ children, className = '', hover = true, onClick }) {
+export function Card({ children, className = '', hover = true, onClick, fire = false }) {
+  if (fire) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={hover ? { y: -4 } : {}}
+        onClick={onClick}
+        className={onClick ? 'cursor-pointer' : ''}
+      >
+        <FireCard intensity="subtle" className={className}>
+          <div className="p-5">{children}</div>
+        </FireCard>
+      </motion.div>
+    )
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -8,7 +25,7 @@ export function Card({ children, className = '', hover = true, onClick }) {
       whileHover={hover ? { y: -4 } : {}}
       onClick={onClick}
       className={`
-        glass-card
+        bg-dark-700/80 border border-white/5 rounded-2xl p-5
         ${onClick ? 'cursor-pointer' : ''}
         ${className}
       `}
@@ -18,7 +35,7 @@ export function Card({ children, className = '', hover = true, onClick }) {
   )
 }
 
-export function StatCard({ icon: Icon, value, label, color = 'orange' }) {
+export function StatCard({ icon: Icon, value, label, color = 'orange', fire = true }) {
   const colors = {
     orange: 'from-orange-500/20 to-orange-600/10 text-orange-400',
     green: 'from-green-500/20 to-green-600/10 text-green-400',
@@ -27,29 +44,82 @@ export function StatCard({ icon: Icon, value, label, color = 'orange' }) {
     red: 'from-red-500/20 to-red-600/10 text-red-400',
   }
 
+  const fireColors = {
+    orange: '#FF6B35',
+    green: '#22c55e',
+    blue: '#3b82f6',
+    purple: '#a855f7',
+    red: '#ef4444',
+  }
+
+  if (fire) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <FireCard intensity="subtle" color={fireColors[color]}>
+          <div className="p-5">
+            <div className="flex items-center gap-4">
+              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${colors[color]} flex items-center justify-center flex-shrink-0`}>
+                <Icon className="w-7 h-7" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-3xl font-bold">{value}</p>
+                <p className="text-sm text-white/50 truncate mt-1">{label}</p>
+              </div>
+            </div>
+          </div>
+        </FireCard>
+      </motion.div>
+    )
+  }
+
   return (
     <Card hover={false}>
-      <div className="flex items-center gap-3 sm:gap-4">
-        <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${colors[color]} flex items-center justify-center flex-shrink-0`}>
-          <Icon className="w-5 h-5 sm:w-7 sm:h-7" />
+      <div className="flex items-center gap-4">
+        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${colors[color]} flex items-center justify-center flex-shrink-0`}>
+          <Icon className="w-7 h-7" />
         </div>
         <div className="min-w-0">
-          <p className="text-2xl sm:text-3xl font-bold">{value}</p>
-          <p className="text-xs sm:text-sm text-white/50 truncate">{label}</p>
+          <p className="text-3xl font-bold">{value}</p>
+          <p className="text-sm text-white/50 truncate mt-1">{label}</p>
         </div>
       </div>
     </Card>
   )
 }
 
-export function QuickAction({ icon: Icon, title, description, onClick }) {
+export function QuickAction({ icon: Icon, title, description, onClick, fire = true }) {
+  if (fire) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ y: -4 }}
+        onClick={onClick}
+        className="cursor-pointer"
+      >
+        <FireCard intensity="subtle">
+          <div className="p-5 text-center">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center mx-auto mb-4">
+              <Icon className="w-6 h-6 text-orange-400" />
+            </div>
+            <h3 className="font-semibold mb-2">{title}</h3>
+            <p className="text-sm text-white/50">{description}</p>
+          </div>
+        </FireCard>
+      </motion.div>
+    )
+  }
+
   return (
     <Card onClick={onClick} className="text-center">
-      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center mx-auto mb-2 sm:mb-3">
-        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
+      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center mx-auto mb-4">
+        <Icon className="w-6 h-6 text-orange-400" />
       </div>
-      <h3 className="font-semibold mb-0.5 sm:mb-1 text-sm sm:text-base">{title}</h3>
-      <p className="text-xs sm:text-sm text-white/50">{description}</p>
+      <h3 className="font-semibold mb-2">{title}</h3>
+      <p className="text-sm text-white/50">{description}</p>
     </Card>
   )
 }

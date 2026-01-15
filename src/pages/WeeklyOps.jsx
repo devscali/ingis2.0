@@ -209,15 +209,15 @@ export default function WeeklyOps() {
       className="space-y-6"
     >
       {/* Header - Clean and minimal */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold text-white">Weekly Operations</h1>
-          <p className="text-sm text-white/40 mt-0.5">{currentWeek?.name || 'Esta semana'}</p>
+          <h1 className="text-2xl font-semibold text-white">Weekly Operations</h1>
+          <p className="text-sm text-white/40 mt-2">{currentWeek?.name || 'Esta semana'}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <button
             onClick={handleNewWeek}
-            className="px-3 py-1.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
+            className="px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
           >
             <Calendar className="w-4 h-4" />
             Cambiar semana
@@ -227,7 +227,7 @@ export default function WeeklyOps() {
               setSelectedDay('lunes')
               setShowNewTask(true)
             }}
-            className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-1.5"
+            className="px-4 py-2.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Nueva tarea
@@ -236,7 +236,7 @@ export default function WeeklyOps() {
       </div>
 
       {/* Kanban Board - Clean card-based columns */}
-      <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 lg:mx-0 lg:px-0">
+      <div className="flex gap-5 overflow-x-auto pb-4 -mx-4 px-4 lg:mx-0 lg:px-0">
         {weekDays.map((day) => {
           const dayTasks = getTasksByDay(day.id)
           const totalTasks = dayTasks.length
@@ -245,10 +245,10 @@ export default function WeeklyOps() {
           return (
             <div key={day.id} className="flex-shrink-0 w-64 lg:w-72">
               {/* Column Header */}
-              <div className="flex items-center justify-between mb-3 px-1">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between mb-4 px-1">
+                <div className="flex items-center gap-3">
                   <div
-                    className="w-2 h-2 rounded-full"
+                    className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: day.color }}
                   />
                   <span className="text-sm font-medium text-white/80">{day.label}</span>
@@ -262,14 +262,14 @@ export default function WeeklyOps() {
                     setTaskForm({ ...taskForm, day: day.id })
                     setShowNewTask(true)
                   }}
-                  className="p-1 hover:bg-white/5 rounded transition-colors"
+                  className="p-2 hover:bg-white/5 rounded transition-colors"
                 >
                   <Plus className="w-4 h-4 text-white/30" />
                 </button>
               </div>
 
               {/* Tasks Column */}
-              <div className="space-y-2 min-h-[400px] bg-white/[0.02] rounded-xl p-2">
+              <div className="space-y-3 min-h-[400px] bg-white/[0.02] rounded-xl p-3">
                 {dayTasks.map((task) => {
                   const status = statusOptions.find(s => s.value === task.status)
                   const pressure = pressureOptions.find(p => p.value === task.pressure)
