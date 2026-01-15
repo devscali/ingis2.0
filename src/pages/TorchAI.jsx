@@ -15,8 +15,7 @@ import { TaskList } from '../components/ui/TaskList'
 import { ViewToggle } from '../components/ui/ViewToggle'
 import { useTasksStore } from '../store/tasksStore'
 import { useAuthStore } from '../store/authStore'
-
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY || ''
+import { useSettingsStore } from '../store/settingsStore'
 
 const tabs = [
   { id: 'capture', label: 'Capturar', icon: PenLine },
@@ -33,6 +32,7 @@ export default function TorchAI() {
 
   const { user } = useAuthStore()
   const { tasks, addSession, toggleTask } = useTasksStore()
+  const { openaiApiKey } = useSettingsStore()
 
   const activeTasks = tasks.filter(t => !t.completed)
   const teamMembers = ['Carlos Armando', 'Sara', 'Ian', 'JC', 'Marlene', 'Papa']
@@ -40,13 +40,18 @@ export default function TorchAI() {
   const handleProcess = async () => {
     if (!noteText.trim()) return
 
+    if (!openaiApiKey) {
+      alert('Configura tu API Key de OpenAI en Settings')
+      return
+    }
+
     setProcessing(true)
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENAI_API_KEY}`
+          'Authorization': `Bearer ${openaiApiKey}`
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',

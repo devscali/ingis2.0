@@ -15,6 +15,7 @@ import ProjectHub from './pages/ProjectHub'
 import Maintenance from './pages/Maintenance'
 import WeeklyOps from './pages/WeeklyOps'
 import FontMixer from './pages/FontMixer'
+import Settings from './pages/Settings'
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -76,6 +77,7 @@ function App() {
           <Route path="maintenance" element={<Maintenance />} />
           <Route path="ops" element={<WeeklyOps />} />
           <Route path="fonts" element={<FontMixer />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

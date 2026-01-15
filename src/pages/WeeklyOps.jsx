@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Flame,
   Plus,
   X,
   Calendar,
@@ -12,40 +11,34 @@ import {
   ChevronLeft,
   ChevronRight,
   MessageSquare,
-  Clock
+  MoreHorizontal,
+  GripVertical,
+  Circle
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
+import { useSettingsStore } from '../store/settingsStore'
 import { db } from '../lib/firebase'
 import { collection, addDoc, deleteDoc, doc, onSnapshot, updateDoc, query, where } from 'firebase/firestore'
 
 const weekDays = [
-  { id: 'cuentas', label: 'Cuentas', color: 'bg-slate-500' },
-  { id: 'lunes', label: 'Lunes', color: 'bg-red-500' },
-  { id: 'martes', label: 'Martes', color: 'bg-orange-500' },
-  { id: 'miercoles', label: 'Miércoles', color: 'bg-yellow-500' },
-  { id: 'jueves', label: 'Jueves', color: 'bg-green-500' },
-  { id: 'viernes', label: 'Viernes', color: 'bg-blue-500' },
+  { id: 'cuentas', label: 'Cuentas', color: '#64748b' },
+  { id: 'lunes', label: 'Lunes', color: '#ef4444' },
+  { id: 'martes', label: 'Martes', color: '#f97316' },
+  { id: 'miercoles', label: 'Miércoles', color: '#eab308' },
+  { id: 'jueves', label: 'Jueves', color: '#22c55e' },
+  { id: 'viernes', label: 'Viernes', color: '#3b82f6' },
 ]
 
 const statusOptions = [
-  { value: 'sin_empezar', label: 'Sin empezar', color: 'bg-gray-500', textColor: 'text-gray-300' },
-  { value: 'en_progreso', label: 'En progreso', color: 'bg-yellow-500', textColor: 'text-yellow-300' },
-  { value: 'listo', label: 'Listo', color: 'bg-green-500', textColor: 'text-green-300' },
+  { value: 'sin_empezar', label: 'Sin empezar', color: '#6b7280', bg: 'bg-gray-500/10', text: 'text-gray-400' },
+  { value: 'en_progreso', label: 'En progreso', color: '#eab308', bg: 'bg-yellow-500/10', text: 'text-yellow-400' },
+  { value: 'listo', label: 'Listo', color: '#22c55e', bg: 'bg-green-500/10', text: 'text-green-400' },
 ]
 
 const pressureOptions = [
-  { value: 'baja', label: 'Presión Baja', color: 'bg-green-600' },
-  { value: 'moderada', label: 'Presión Moderada', color: 'bg-yellow-600' },
-  { value: 'alta', label: 'Presión Alta', color: 'bg-red-600' },
-]
-
-const teamMembers = [
-  { id: 'carlos', name: 'Carlos Armando', color: 'bg-blue-500' },
-  { id: 'leslie', name: 'Leslie Marlene Morales Hilario', color: 'bg-pink-500' },
-  { id: 'sara', name: 'Sara Esther Valenzuela Torres', color: 'bg-purple-500' },
-  { id: 'vladimir', name: 'Vladimir', color: 'bg-indigo-500' },
-  { id: 'ian', name: 'Ian Andrade', color: 'bg-green-500' },
-  { id: 'jesus', name: 'Jesus Lerma', color: 'bg-orange-500' },
+  { value: 'baja', label: 'Baja', color: '#22c55e' },
+  { value: 'moderada', label: 'Media', color: '#eab308' },
+  { value: 'alta', label: 'Alta', color: '#ef4444' },
 ]
 
 export default function WeeklyOps() {
@@ -60,27 +53,27 @@ export default function WeeklyOps() {
 
   const [taskForm, setTaskForm] = useState({
     title: '',
-    icon: '',
     day: 'lunes',
     responsibles: [],
     status: 'sin_empezar',
     pressure: '',
     dueDate: '',
-    semaforo: '',
     subtasks: [],
     comments: []
   })
 
   const { user } = useAuthStore()
+  const { teamMembers } = useSettingsStore()
 
   // Get current week string
   const getWeekString = (date = new Date()) => {
     const d = new Date(date)
     d.setHours(0, 0, 0, 0)
-    d.setDate(d.getDate() - d.getDay() + 1) // Monday
-    const month = d.toLocaleString('es-MX', { month: 'long' })
-    const weekNum = Math.ceil(d.getDate() / 7)
-    return `Semana ${weekNum} ${month.charAt(0).toUpperCase() + month.slice(1)}`
+    d.setDate(d.getDate() - d.getDay() + 1)
+    const month = d.toLocaleString('es-MX', { month: 'short' })
+    const day = d.getDate()
+    const endDay = day + 6
+    return `${day} - ${endDay} ${month}`
   }
 
   // Load weeks
@@ -92,7 +85,6 @@ export default function WeeklyOps() {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
       setWeeks(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
 
-      // Set current week or create one
       const currentWeekStr = getWeekString()
       const existingWeek = data.find(w => w.name === currentWeekStr)
       if (existingWeek) {
@@ -104,14 +96,12 @@ export default function WeeklyOps() {
     return () => unsubscribe()
   }, [user?.uid])
 
-  // Create week if needed
   useEffect(() => {
     if (user?.uid && weeks.length === 0) {
       createWeek(getWeekString())
     }
   }, [user?.uid, weeks.length])
 
-  // Load tasks for current week
   useEffect(() => {
     if (!currentWeek?.id) return
 
@@ -134,9 +124,7 @@ export default function WeeklyOps() {
 
   const handleNewWeek = async () => {
     const name = prompt('Nombre de la semana:', getWeekString())
-    if (name) {
-      await createWeek(name)
-    }
+    if (name) await createWeek(name)
   }
 
   const handleAddTask = async (e) => {
@@ -151,13 +139,11 @@ export default function WeeklyOps() {
 
     setTaskForm({
       title: '',
-      icon: '',
       day: selectedDay,
       responsibles: [],
       status: 'sin_empezar',
       pressure: '',
       dueDate: '',
-      semaforo: '',
       subtasks: [],
       comments: []
     })
@@ -187,8 +173,7 @@ export default function WeeklyOps() {
     if (!newSubtask.trim()) return
     const newSubtasks = [...(task.subtasks || []), {
       text: newSubtask,
-      completed: false,
-      assignee: ''
+      completed: false
     }]
     await handleUpdateTask(task.id, { subtasks: newSubtasks })
     setNewSubtask('')
@@ -206,7 +191,6 @@ export default function WeeklyOps() {
   }
 
   const getTasksByDay = (day) => tasks.filter(t => t.day === day)
-
   const getMember = (id) => teamMembers.find(m => m.id === id)
 
   const toggleResponsible = (memberId) => {
@@ -222,58 +206,70 @@ export default function WeeklyOps() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6 sm:space-y-8"
+      className="space-y-6"
     >
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
-            <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold">Calidevs Ops</h1>
-            <p className="text-white/50 text-xs sm:text-sm">Operaciones semanales del equipo</p>
-          </div>
+      {/* Header - Clean and minimal */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-white">Weekly Operations</h1>
+          <p className="text-sm text-white/40 mt-0.5">{currentWeek?.name || 'Esta semana'}</p>
         </div>
-
-        {/* Week selector */}
         <div className="flex items-center gap-2">
           <button
             onClick={handleNewWeek}
-            className="glass px-4 py-2 flex items-center gap-2 hover:bg-white/10 transition-colors"
+            className="px-3 py-1.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
           >
             <Calendar className="w-4 h-4" />
-            {currentWeek?.name || 'Seleccionar semana'}
+            Cambiar semana
           </button>
           <button
             onClick={() => {
               setSelectedDay('lunes')
               setShowNewTask(true)
             }}
-            className="btn-accent flex items-center gap-2"
+            className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-1.5"
           >
-            <Plus className="w-5 h-5" />
-            New
+            <Plus className="w-4 h-4" />
+            Nueva tarea
           </button>
         </div>
       </div>
 
-      {/* Kanban Board */}
-      <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+      {/* Kanban Board - Clean card-based columns */}
+      <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 lg:mx-0 lg:px-0">
         {weekDays.map((day) => {
           const dayTasks = getTasksByDay(day.id)
+          const totalTasks = dayTasks.length
+          const completedTasks = dayTasks.filter(t => t.status === 'listo').length
+
           return (
-            <div key={day.id} className="flex-shrink-0 w-56 sm:w-64 lg:w-72">
+            <div key={day.id} className="flex-shrink-0 w-64 lg:w-72">
               {/* Column Header */}
-              <div className="flex items-center gap-2 mb-3">
-                <span className={`px-3 py-1 rounded-lg text-sm font-semibold ${day.color} text-white`}>
-                  {day.label}
-                </span>
-                <span className="text-white/40 text-sm">{dayTasks.length}</span>
+              <div className="flex items-center justify-between mb-3 px-1">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: day.color }}
+                  />
+                  <span className="text-sm font-medium text-white/80">{day.label}</span>
+                  <span className="text-xs text-white/30 tabular-nums">
+                    {completedTasks}/{totalTasks}
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedDay(day.id)
+                    setTaskForm({ ...taskForm, day: day.id })
+                    setShowNewTask(true)
+                  }}
+                  className="p-1 hover:bg-white/5 rounded transition-colors"
+                >
+                  <Plus className="w-4 h-4 text-white/30" />
+                </button>
               </div>
 
-              {/* Tasks */}
-              <div className="space-y-3 min-h-[500px]">
+              {/* Tasks Column */}
+              <div className="space-y-2 min-h-[400px] bg-white/[0.02] rounded-xl p-2">
                 {dayTasks.map((task) => {
                   const status = statusOptions.find(s => s.value === task.status)
                   const pressure = pressureOptions.find(p => p.value === task.pressure)
@@ -283,157 +279,156 @@ export default function WeeklyOps() {
                   return (
                     <motion.div
                       key={task.id}
-                      initial={{ opacity: 0, y: 10 }}
+                      layoutId={task.id}
+                      initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       onClick={() => setShowTaskDetail(task)}
-                      className="glass rounded-xl p-4 cursor-pointer hover:bg-white/10 transition-all group"
+                      className="bg-dark-700/80 hover:bg-dark-600/80 border border-white/5 hover:border-white/10 rounded-lg p-3 cursor-pointer transition-all group"
                     >
-                      {/* Icon + Title */}
-                      <div className="flex items-start gap-2 mb-3">
-                        {task.icon && <span className="text-lg">{task.icon}</span>}
-                        <h4 className="font-medium flex-1 leading-tight">{task.title}</h4>
-                      </div>
+                      {/* Title */}
+                      <p className="text-sm font-medium text-white/90 mb-2 leading-snug">
+                        {task.title}
+                      </p>
 
-                      {/* Responsibles */}
+                      {/* Responsibles - Compact avatars */}
                       {task.responsibles?.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {task.responsibles.map((memberId) => {
+                        <div className="flex items-center gap-1 mb-2">
+                          {task.responsibles.slice(0, 3).map((memberId) => {
                             const member = getMember(memberId)
                             if (!member) return null
                             return (
                               <div
                                 key={memberId}
-                                className="flex items-center gap-1 text-xs text-white/60"
+                                className={`w-5 h-5 rounded-full ${member.color} flex items-center justify-center text-[9px] text-white font-medium`}
+                                title={member.name}
                               >
-                                <div className={`w-5 h-5 rounded-full ${member.color} flex items-center justify-center text-white text-[10px] font-bold`}>
-                                  {member.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
-                                </div>
-                                <span className="truncate max-w-[100px]">{member.name.split(' ')[0]}</span>
+                                {member.name[0]}
                               </div>
                             )
                           })}
+                          {task.responsibles.length > 3 && (
+                            <span className="text-[10px] text-white/40 ml-1">
+                              +{task.responsibles.length - 3}
+                            </span>
+                          )}
                         </div>
                       )}
 
-                      {/* Status */}
-                      {status && (
-                        <div className="mb-2">
-                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.color} text-white`}>
-                            <span className="w-1.5 h-1.5 rounded-full bg-white/50" />
-                            {status.label}
+                      {/* Bottom row - Status & metadata */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {/* Status */}
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${status?.bg} ${status?.text}`}>
+                            {status?.label}
                           </span>
-                        </div>
-                      )}
 
-                      {/* Pressure */}
-                      {pressure && (
-                        <div className="mb-2">
-                          <span className={`inline-block px-2 py-1 rounded-lg text-xs font-medium ${pressure.color} text-white`}>
-                            {pressure.label}
+                          {/* Pressure indicator */}
+                          {pressure && (
+                            <div
+                              className="w-2 h-2 rounded-full"
+                              style={{ backgroundColor: pressure.color }}
+                              title={`Prioridad ${pressure.label}`}
+                            />
+                          )}
+                        </div>
+
+                        {/* Subtasks count */}
+                        {totalSubtasks > 0 && (
+                          <span className="text-[10px] text-white/30 flex items-center gap-1">
+                            <CheckSquare className="w-3 h-3" />
+                            {completedSubtasks}/{totalSubtasks}
                           </span>
-                        </div>
-                      )}
-
-                      {/* Subtasks progress */}
-                      {totalSubtasks > 0 && (
-                        <div className="flex items-center gap-2 text-xs text-white/40 mt-2">
-                          <CheckSquare className="w-3 h-3" />
-                          <span>{completedSubtasks}/{totalSubtasks}</span>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </motion.div>
                   )
                 })}
 
-                {/* Add task button */}
-                <button
-                  onClick={() => {
-                    setSelectedDay(day.id)
-                    setTaskForm({ ...taskForm, day: day.id })
-                    setShowNewTask(true)
-                  }}
-                  className="w-full p-3 rounded-xl border-2 border-dashed border-white/10 text-white/30 hover:border-orange-500/50 hover:text-orange-500 transition-all flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  New task
-                </button>
+                {/* Empty state */}
+                {dayTasks.length === 0 && (
+                  <div className="h-20 flex items-center justify-center">
+                    <span className="text-xs text-white/20">Sin tareas</span>
+                  </div>
+                )}
               </div>
             </div>
           )
         })}
       </div>
 
-      {/* New Task Modal */}
+      {/* New Task Modal - Clean and minimal */}
       <AnimatePresence>
         {showNewTask && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto"
             onClick={() => setShowNewTask(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card w-full max-w-xl max-h-[90vh] overflow-y-auto p-8 sm:p-10"
+              className="bg-dark-800 border border-white/10 rounded-xl w-full max-w-lg p-6 my-8 sm:my-0"
             >
-              <h2 className="text-2xl sm:text-3xl font-bold mb-10">Nueva Tarea</h2>
-              <form onSubmit={handleAddTask} className="space-y-8">
-                {/* Title with icon */}
-                <div className="flex gap-4">
-                  <input
-                    type="text"
-                    value={taskForm.icon}
-                    onChange={(e) => setTaskForm({ ...taskForm, icon: e.target.value })}
-                    placeholder="Icon"
-                    className="glass-input w-24 text-center text-2xl py-4"
-                  />
+              <h2 className="text-lg font-semibold mb-6">Nueva tarea</h2>
+
+              <form onSubmit={handleAddTask} className="space-y-5">
+                {/* Title */}
+                <div>
                   <input
                     type="text"
                     value={taskForm.title}
                     onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
                     placeholder="Nombre de la tarea"
-                    className="glass-input flex-1 py-4"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none transition-colors"
                     autoFocus
                   />
                 </div>
 
                 {/* Day */}
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Día</label>
-                  <select
-                    value={taskForm.day}
-                    onChange={(e) => setTaskForm({ ...taskForm, day: e.target.value })}
-                    className="glass-input w-full py-4"
-                  >
+                  <label className="block text-xs text-white/40 mb-2">Día</label>
+                  <div className="flex flex-wrap gap-2">
                     {weekDays.map((d) => (
-                      <option key={d.id} value={d.id}>{d.label}</option>
+                      <button
+                        key={d.id}
+                        type="button"
+                        onClick={() => setTaskForm({ ...taskForm, day: d.id })}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          taskForm.day === d.id
+                            ? 'text-white'
+                            : 'text-white/50 hover:text-white/70 bg-white/5'
+                        }`}
+                        style={taskForm.day === d.id ? { backgroundColor: d.color } : {}}
+                      >
+                        {d.label}
+                      </button>
                     ))}
-                  </select>
+                  </div>
                 </div>
 
                 {/* Responsibles */}
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Responsables</label>
-                  <div className="flex flex-wrap gap-3">
+                  <label className="block text-xs text-white/40 mb-2">Responsables</label>
+                  <div className="flex flex-wrap gap-2">
                     {teamMembers.map((member) => (
                       <button
                         key={member.id}
                         type="button"
                         onClick={() => toggleResponsible(member.id)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                        className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all ${
                           taskForm.responsibles?.includes(member.id)
                             ? `${member.color} text-white`
-                            : 'glass hover:bg-white/10'
+                            : 'bg-white/5 text-white/50 hover:text-white/70'
                         }`}
                       >
-                        <div className={`w-8 h-8 rounded-full ${member.color} flex items-center justify-center text-white text-sm font-bold`}>
+                        <div className={`w-4 h-4 rounded-full ${member.color} flex items-center justify-center text-[8px] text-white font-bold`}>
                           {member.name[0]}
                         </div>
-                        <span className="text-sm font-medium">{member.name.split(' ')[0]}</span>
+                        {member.name.split(' ')[0]}
                       </button>
                     ))}
                   </div>
@@ -441,17 +436,17 @@ export default function WeeklyOps() {
 
                 {/* Status */}
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Status</label>
-                  <div className="flex gap-3">
+                  <label className="block text-xs text-white/40 mb-2">Estado</label>
+                  <div className="flex gap-2">
                     {statusOptions.map((s) => (
                       <button
                         key={s.value}
                         type="button"
                         onClick={() => setTaskForm({ ...taskForm, status: s.value })}
-                        className={`flex-1 px-4 py-3.5 rounded-xl text-sm font-medium transition-all ${
+                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                           taskForm.status === s.value
-                            ? `${s.color} text-white`
-                            : 'glass hover:bg-white/10'
+                            ? `${s.bg} ${s.text} ring-1 ring-current`
+                            : 'bg-white/5 text-white/50 hover:text-white/70'
                         }`}
                       >
                         {s.label}
@@ -460,48 +455,43 @@ export default function WeeklyOps() {
                   </div>
                 </div>
 
-                {/* Pressure */}
+                {/* Priority */}
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Semáforo Operativo</label>
-                  <div className="flex gap-3">
+                  <label className="block text-xs text-white/40 mb-2">Prioridad</label>
+                  <div className="flex gap-2">
                     {pressureOptions.map((p) => (
                       <button
                         key={p.value}
                         type="button"
-                        onClick={() => setTaskForm({ ...taskForm, pressure: p.value })}
-                        className={`flex-1 px-4 py-3.5 rounded-xl text-sm font-medium transition-all ${
+                        onClick={() => setTaskForm({ ...taskForm, pressure: taskForm.pressure === p.value ? '' : p.value })}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                           taskForm.pressure === p.value
-                            ? `${p.color} text-white`
-                            : 'glass hover:bg-white/10'
+                            ? 'ring-1'
+                            : 'bg-white/5 text-white/50 hover:text-white/70'
                         }`}
+                        style={taskForm.pressure === p.value ? { color: p.color, borderColor: p.color } : {}}
                       >
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
                         {p.label}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Due Date */}
-                <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-4">Fecha límite</label>
-                  <input
-                    type="date"
-                    value={taskForm.dueDate}
-                    onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
-                    className="glass-input w-full py-4"
-                  />
-                </div>
-
-                <div className="flex gap-4 pt-8">
+                {/* Actions */}
+                <div className="flex gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => setShowNewTask(false)}
-                    className="flex-1 glass-button py-4 text-base"
+                    className="flex-1 px-4 py-2.5 text-sm text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
                   >
                     Cancelar
                   </button>
-                  <button type="submit" className="flex-1 btn-accent py-4 text-base">
-                    Crear
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  >
+                    Crear tarea
                   </button>
                 </div>
               </form>
@@ -517,29 +507,24 @@ export default function WeeklyOps() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto"
             onClick={() => setShowTaskDetail(null)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-dark-800 border border-white/10 rounded-xl w-full max-w-xl p-6 my-8 sm:my-0"
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  {showTaskDetail.icon && (
-                    <span className="text-3xl">{showTaskDetail.icon}</span>
-                  )}
-                  <h2 className="text-2xl font-bold">{showTaskDetail.title}</h2>
-                </div>
+                <h2 className="text-lg font-semibold pr-4">{showTaskDetail.title}</h2>
                 <button
                   onClick={() => setShowTaskDetail(null)}
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  className="p-1.5 hover:bg-white/5 rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 text-white/40" />
                 </button>
               </div>
 
@@ -547,25 +532,30 @@ export default function WeeklyOps() {
               <div className="space-y-4 mb-6">
                 {/* Day */}
                 <div className="flex items-center gap-4">
-                  <span className="text-white/40 w-32">Etiquetas</span>
-                  <select
-                    value={showTaskDetail.day}
-                    onChange={(e) => {
-                      handleUpdateTask(showTaskDetail.id, { day: e.target.value })
-                      setShowTaskDetail({ ...showTaskDetail, day: e.target.value })
-                    }}
-                    className="glass-input"
-                  >
+                  <span className="text-xs text-white/40 w-24">Día</span>
+                  <div className="flex gap-1">
                     {weekDays.map((d) => (
-                      <option key={d.id} value={d.id}>{d.label}</option>
+                      <button
+                        key={d.id}
+                        onClick={() => {
+                          handleUpdateTask(showTaskDetail.id, { day: d.id })
+                          setShowTaskDetail({ ...showTaskDetail, day: d.id })
+                        }}
+                        className={`px-2 py-1 rounded text-[10px] font-medium transition-all ${
+                          showTaskDetail.day === d.id ? 'text-white' : 'text-white/30 hover:text-white/50'
+                        }`}
+                        style={showTaskDetail.day === d.id ? { backgroundColor: d.color } : {}}
+                      >
+                        {d.label.slice(0, 3)}
+                      </button>
                     ))}
-                  </select>
+                  </div>
                 </div>
 
                 {/* Responsibles */}
                 <div className="flex items-start gap-4">
-                  <span className="text-white/40 w-32 pt-2">Responsable</span>
-                  <div className="flex flex-wrap gap-2 flex-1">
+                  <span className="text-xs text-white/40 w-24 pt-1">Responsables</span>
+                  <div className="flex flex-wrap gap-1 flex-1">
                     {teamMembers.map((member) => {
                       const isSelected = showTaskDetail.responsibles?.includes(member.id)
                       return (
@@ -579,11 +569,11 @@ export default function WeeklyOps() {
                             handleUpdateTask(showTaskDetail.id, { responsibles: newResp })
                             setShowTaskDetail({ ...showTaskDetail, responsibles: newResp })
                           }}
-                          className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-all text-sm ${
-                            isSelected ? `${member.color} text-white` : 'glass hover:bg-white/10'
+                          className={`flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-medium transition-all ${
+                            isSelected ? `${member.color} text-white` : 'bg-white/5 text-white/40 hover:text-white/60'
                           }`}
                         >
-                          <div className={`w-5 h-5 rounded-full ${member.color} flex items-center justify-center text-white text-[10px] font-bold`}>
+                          <div className={`w-4 h-4 rounded-full ${member.color} flex items-center justify-center text-[8px] text-white`}>
                             {member.name[0]}
                           </div>
                           {member.name.split(' ')[0]}
@@ -595,8 +585,8 @@ export default function WeeklyOps() {
 
                 {/* Status */}
                 <div className="flex items-center gap-4">
-                  <span className="text-white/40 w-32">Status</span>
-                  <div className="flex gap-2">
+                  <span className="text-xs text-white/40 w-24">Estado</span>
+                  <div className="flex gap-1">
                     {statusOptions.map((s) => (
                       <button
                         key={s.value}
@@ -604,10 +594,10 @@ export default function WeeklyOps() {
                           handleUpdateTask(showTaskDetail.id, { status: s.value })
                           setShowTaskDetail({ ...showTaskDetail, status: s.value })
                         }}
-                        className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                        className={`px-2 py-1 rounded text-[10px] font-medium transition-all ${
                           showTaskDetail.status === s.value
-                            ? `${s.color} text-white`
-                            : 'glass hover:bg-white/10'
+                            ? `${s.bg} ${s.text}`
+                            : 'bg-white/5 text-white/30 hover:text-white/50'
                         }`}
                       >
                         {s.label}
@@ -616,69 +606,51 @@ export default function WeeklyOps() {
                   </div>
                 </div>
 
-                {/* Pressure / Semaforo */}
+                {/* Priority */}
                 <div className="flex items-center gap-4">
-                  <span className="text-white/40 w-32">Semáforo</span>
-                  <div className="flex gap-2">
+                  <span className="text-xs text-white/40 w-24">Prioridad</span>
+                  <div className="flex gap-1">
                     {pressureOptions.map((p) => (
                       <button
                         key={p.value}
                         onClick={() => {
-                          handleUpdateTask(showTaskDetail.id, { pressure: p.value })
-                          setShowTaskDetail({ ...showTaskDetail, pressure: p.value })
+                          const newPressure = showTaskDetail.pressure === p.value ? '' : p.value
+                          handleUpdateTask(showTaskDetail.id, { pressure: newPressure })
+                          setShowTaskDetail({ ...showTaskDetail, pressure: newPressure })
                         }}
-                        className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-medium transition-all ${
                           showTaskDetail.pressure === p.value
-                            ? `${p.color} text-white`
-                            : 'glass hover:bg-white/10'
+                            ? 'bg-white/10'
+                            : 'bg-white/5 text-white/30 hover:text-white/50'
                         }`}
+                        style={showTaskDetail.pressure === p.value ? { color: p.color } : {}}
                       >
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
                         {p.label}
                       </button>
                     ))}
                   </div>
                 </div>
-
-                {/* Due Date */}
-                <div className="flex items-center gap-4">
-                  <span className="text-white/40 w-32">Fecha límite</span>
-                  <input
-                    type="date"
-                    value={showTaskDetail.dueDate || ''}
-                    onChange={(e) => {
-                      handleUpdateTask(showTaskDetail.id, { dueDate: e.target.value })
-                      setShowTaskDetail({ ...showTaskDetail, dueDate: e.target.value })
-                    }}
-                    className="glass-input"
-                  />
-                </div>
               </div>
 
-              {/* Subtasks / Checklist */}
-              <div className="border-t border-white/10 pt-6 mb-6">
-                <h3 className="text-sm text-white/40 uppercase tracking-wider mb-4">Subtareas</h3>
-                <div className="space-y-2 mb-4">
+              {/* Subtasks */}
+              <div className="border-t border-white/5 pt-4 mb-4">
+                <h3 className="text-xs text-white/40 mb-3">Subtareas</h3>
+                <div className="space-y-1 mb-3">
                   {(showTaskDetail.subtasks || []).map((subtask, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5"
+                      className="flex items-center gap-2 p-2 rounded hover:bg-white/5 cursor-pointer"
+                      onClick={() => handleToggleSubtask(showTaskDetail, index)}
                     >
-                      <button
-                        onClick={() => handleToggleSubtask(showTaskDetail, index)}
-                        className="text-white/50 hover:text-white"
-                      >
-                        {subtask.completed ? (
-                          <CheckSquare className="w-5 h-5 text-green-500" />
-                        ) : (
-                          <Square className="w-5 h-5" />
-                        )}
-                      </button>
-                      <span className={`flex-1 ${subtask.completed ? 'line-through text-white/40' : ''}`}>
+                      {subtask.completed ? (
+                        <CheckSquare className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Square className="w-4 h-4 text-white/30" />
+                      )}
+                      <span className={`text-sm flex-1 ${subtask.completed ? 'line-through text-white/30' : ''}`}>
                         {subtask.text}
                       </span>
-                      {subtask.assignee && (
-                        <span className="text-xs text-blue-400">@{subtask.assignee}</span>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -689,32 +661,32 @@ export default function WeeklyOps() {
                     onChange={(e) => setNewSubtask(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSubtask(showTaskDetail))}
                     placeholder="Agregar subtarea..."
-                    className="glass-input flex-1"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
                   />
                   <button
                     onClick={() => handleAddSubtask(showTaskDetail)}
-                    className="btn-accent px-4"
+                    className="px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
               {/* Comments */}
-              <div className="border-t border-white/10 pt-6">
-                <h3 className="text-sm text-white/40 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4" />
-                  Comments
+              <div className="border-t border-white/5 pt-4 mb-4">
+                <h3 className="text-xs text-white/40 mb-3 flex items-center gap-2">
+                  <MessageSquare className="w-3 h-3" />
+                  Comentarios
                 </h3>
-                <div className="space-y-3 mb-4">
+                <div className="space-y-3 mb-3">
                   {(showTaskDetail.comments || []).map((comment, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold">
+                    <div key={index} className="flex items-start gap-2">
+                      <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-medium flex-shrink-0">
                         {comment.author?.[0] || 'U'}
                       </div>
-                      <div className="flex-1">
+                      <div>
                         <p className="text-sm">{comment.text}</p>
-                        <p className="text-xs text-white/30 mt-1">
+                        <p className="text-[10px] text-white/30 mt-0.5">
                           {comment.author} · {new Date(comment.createdAt).toLocaleDateString('es-MX')}
                         </p>
                       </div>
@@ -727,12 +699,12 @@ export default function WeeklyOps() {
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddComment(showTaskDetail))}
-                    placeholder="Add a comment..."
-                    className="glass-input flex-1"
+                    placeholder="Escribir comentario..."
+                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
                   />
                   <button
                     onClick={() => handleAddComment(showTaskDetail)}
-                    className="btn-accent px-4"
+                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-sm"
                   >
                     Enviar
                   </button>
@@ -740,12 +712,12 @@ export default function WeeklyOps() {
               </div>
 
               {/* Delete */}
-              <div className="border-t border-white/10 pt-6 mt-6">
+              <div className="border-t border-white/5 pt-4">
                 <button
                   onClick={() => handleDeleteTask(showTaskDetail.id)}
-                  className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
+                  className="flex items-center gap-2 text-xs text-red-400 hover:text-red-300 transition-colors"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3 h-3" />
                   Eliminar tarea
                 </button>
               </div>

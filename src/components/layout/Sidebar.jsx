@@ -10,7 +10,8 @@ import {
   LogOut,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Settings
 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { useTasksStore } from '../../store/tasksStore'
@@ -23,6 +24,7 @@ const navItems = [
   { path: '/projects', icon: Kanban, label: 'Project Hub', section: 'Módulos' },
   { path: '/maintenance', icon: Wrench, label: 'Mantenimiento', section: 'Módulos' },
   { path: '/fonts', icon: Type, label: 'Font Mixer', section: 'Herramientas' },
+  { path: '/settings', icon: Settings, label: 'Settings', section: 'Herramientas' },
 ]
 
 export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }) {
