@@ -11,15 +11,17 @@ import {
   Trash2,
   Building2,
   Search,
-  Filter,
   LayoutGrid,
   List,
   RefreshCw,
   Mail,
   Phone,
   MapPin,
-  MoreVertical,
-  Edit3
+  Edit3,
+  Flame,
+  Sparkles,
+  User,
+  FileText
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { db } from '../lib/firebase'
@@ -48,23 +50,48 @@ const clientColors = [
   'from-cyan-500 to-cyan-600',
 ]
 
+// Fire particle effect
+const FireParticle = ({ delay = 0 }) => (
+  <motion.div
+    className="absolute w-1 h-1 rounded-full bg-orange-500"
+    initial={{ opacity: 0, y: 0, scale: 0 }}
+    animate={{
+      opacity: [0, 1, 0],
+      y: [-15, -35],
+      scale: [0, 1, 0],
+      x: [0, Math.random() * 8 - 4]
+    }}
+    transition={{
+      duration: 0.8,
+      delay,
+      repeat: Infinity,
+      repeatDelay: Math.random() * 0.3
+    }}
+  />
+)
+
 export default function Maintenance() {
   const [clients, setClients] = useState([])
   const [tasks, setTasks] = useState([])
-  const [showNewClient, setShowNewClient] = useState(false)
-  const [showNewTask, setShowNewTask] = useState(false)
+  const [showClientModal, setShowClientModal] = useState(false)
+  const [showTaskModal, setShowTaskModal] = useState(false)
+  const [editingClient, setEditingClient] = useState(null)
+  const [editingTask, setEditingTask] = useState(null)
   const [selectedClient, setSelectedClient] = useState(null)
   const [viewMode, setViewMode] = useState('grid')
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
+
   const [clientForm, setClientForm] = useState({
     name: '',
     contact: '',
     email: '',
     phone: '',
     location: '',
+    notes: '',
     status: 'active'
   })
+
   const [taskForm, setTaskForm] = useState({
     description: '',
     priority: 'media',
@@ -97,46 +124,129 @@ export default function Maintenance() {
     return () => unsubscribe()
   }, [user?.uid])
 
-  const handleAddClient = async (e) => {
+  // Client CRUD
+  const openNewClientModal = () => {
+    setEditingClient(null)
+    setClientForm({
+      name: '',
+      contact: '',
+      email: '',
+      phone: '',
+      location: '',
+      notes: '',
+      status: 'active'
+    })
+    setShowClientModal(true)
+  }
+
+  const openEditClientModal = (client) => {
+    setEditingClient(client)
+    setClientForm({
+      name: client.name || '',
+      contact: client.contact || '',
+      email: client.email || '',
+      phone: client.phone || '',
+      location: client.location || '',
+      notes: client.notes || '',
+      status: client.status || 'active'
+    })
+    setShowClientModal(true)
+  }
+
+  const handleSaveClient = async (e) => {
     e.preventDefault()
     if (!clientForm.name.trim()) return
 
-    const colorIndex = clients.length % clientColors.length
+    if (editingClient) {
+      await updateDoc(doc(db, 'maintenance_clients', editingClient.id), {
+        ...clientForm,
+        updatedAt: new Date().toISOString()
+      })
+    } else {
+      const colorIndex = clients.length % clientColors.length
+      await addDoc(collection(db, 'maintenance_clients'), {
+        userId: user.uid,
+        ...clientForm,
+        color: clientColors[colorIndex],
+        createdAt: new Date().toISOString()
+      })
+    }
 
-    await addDoc(collection(db, 'maintenance_clients'), {
-      userId: user.uid,
-      name: clientForm.name.trim(),
-      contact: clientForm.contact.trim(),
-      email: clientForm.email.trim(),
-      phone: clientForm.phone.trim(),
-      location: clientForm.location.trim(),
-      status: clientForm.status,
-      color: clientColors[colorIndex],
-      createdAt: new Date().toISOString()
+    setShowClientModal(false)
+    setEditingClient(null)
+    setClientForm({
+      name: '',
+      contact: '',
+      email: '',
+      phone: '',
+      location: '',
+      notes: '',
+      status: 'active'
     })
-
-    setClientForm({ name: '', contact: '', email: '', phone: '', location: '', status: 'active' })
-    setShowNewClient(false)
   }
 
-  const handleAddTask = async (e) => {
+  const handleDeleteClient = async (clientId) => {
+    if (!confirm('Esto eliminará el cliente y todas sus tareas. ¿Continuar?')) return
+
+    const clientTasks = tasks.filter(t => t.clientId === clientId)
+    for (const task of clientTasks) {
+      await deleteDoc(doc(db, 'maintenance_tasks', task.id))
+    }
+
+    await deleteDoc(doc(db, 'maintenance_clients', clientId))
+  }
+
+  // Task CRUD
+  const openNewTaskModal = (client) => {
+    setSelectedClient(client)
+    setEditingTask(null)
+    setTaskForm({
+      description: '',
+      priority: 'media',
+      dueDate: ''
+    })
+    setShowTaskModal(true)
+  }
+
+  const openEditTaskModal = (task, client) => {
+    setSelectedClient(client)
+    setEditingTask(task)
+    setTaskForm({
+      description: task.description || '',
+      priority: task.priority || 'media',
+      dueDate: task.dueDate || ''
+    })
+    setShowTaskModal(true)
+  }
+
+  const handleSaveTask = async (e) => {
     e.preventDefault()
     if (!taskForm.description.trim() || !selectedClient) return
 
-    await addDoc(collection(db, 'maintenance_tasks'), {
-      userId: user.uid,
-      clientId: selectedClient.id,
-      clientName: selectedClient.name,
-      description: taskForm.description.trim(),
-      priority: taskForm.priority,
-      dueDate: taskForm.dueDate,
-      completed: false,
-      createdAt: new Date().toISOString()
-    })
+    if (editingTask) {
+      await updateDoc(doc(db, 'maintenance_tasks', editingTask.id), {
+        ...taskForm,
+        updatedAt: new Date().toISOString()
+      })
+    } else {
+      await addDoc(collection(db, 'maintenance_tasks'), {
+        userId: user.uid,
+        clientId: selectedClient.id,
+        clientName: selectedClient.name,
+        ...taskForm,
+        completed: false,
+        createdAt: new Date().toISOString()
+      })
+    }
 
-    setTaskForm({ description: '', priority: 'media', dueDate: '' })
-    setShowNewTask(false)
+    setShowTaskModal(false)
+    setEditingTask(null)
     setSelectedClient(null)
+    setTaskForm({
+      description: '',
+      priority: 'media',
+      dueDate: ''
+    })
   }
 
   const handleToggleTask = async (task) => {
@@ -147,18 +257,8 @@ export default function Maintenance() {
   }
 
   const handleDeleteTask = async (taskId) => {
+    if (!confirm('¿Eliminar esta tarea?')) return
     await deleteDoc(doc(db, 'maintenance_tasks', taskId))
-  }
-
-  const handleDeleteClient = async (clientId) => {
-    if (!confirm('Esto eliminara el cliente y todas sus tareas. Continuar?')) return
-
-    const clientTasks = tasks.filter(t => t.clientId === clientId)
-    for (const task of clientTasks) {
-      await deleteDoc(doc(db, 'maintenance_tasks', task.id))
-    }
-
-    await deleteDoc(doc(db, 'maintenance_clients', clientId))
   }
 
   const getClientTasks = (clientId) => tasks.filter(t => t.clientId === clientId)
@@ -182,129 +282,122 @@ export default function Maintenance() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-10 sm:space-y-12"
+      className="space-y-8"
     >
       {/* Header */}
-      <div className="flex flex-col gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">Planes de Mantenimiento</h1>
-          <p className="text-white/50 text-sm sm:text-base">Gestiona tus clientes y sus pendientes</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <button
-            className="glass-button px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2 text-sm"
-          >
-            <Filter className="w-4 h-4" />
-            <span className="hidden xs:inline">Inactivos</span>
-          </button>
-          <button
-            onClick={() => setShowNewClient(true)}
-            className="btn-accent flex items-center gap-2 py-2 px-3 sm:py-3 sm:px-5 text-sm sm:text-base"
-          >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="hidden xs:inline">Agregar</span> Cliente
-          </button>
-        </div>
-      </div>
-
-      {/* Search and Filters Bar */}
-      <div className="glass-card p-3 sm:p-4 md:p-6">
-        <div className="flex flex-col gap-3 sm:gap-4">
-          {/* Search - always full width on mobile */}
-          <div className="relative">
-            <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-white/30" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar clientes..."
-              className="glass-input w-full pl-10 sm:pl-12 py-2.5 sm:py-3 text-sm sm:text-base"
-            />
-          </div>
-
-          {/* Filters row */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {/* Status Filter */}
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="glass-input py-2 sm:py-3 px-3 sm:px-4 text-sm flex-1 min-w-[120px] sm:min-w-[160px] sm:flex-none"
-            >
-              <option value="all">Todos</option>
-              <option value="active">Activos</option>
-              <option value="inactive">Inactivos</option>
-              <option value="pending">Pendientes</option>
-            </select>
-
-            {/* View Toggle */}
-            <div className="flex items-center gap-1 glass rounded-xl p-1">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 sm:p-2.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-white/50 hover:text-white'}`}
-              >
-                <LayoutGrid className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 sm:p-2.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-white/50 hover:text-white'}`}
-              >
-                <List className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <Wrench className="w-7 h-7 text-white" />
+            {/* Fire particles */}
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2">
+              {[0, 0.15, 0.3].map((delay, i) => (
+                <FireParticle key={i} delay={delay} />
+              ))}
             </div>
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+              Mantenimiento
+              <Flame className="w-5 h-5 text-orange-500 animate-pulse" />
+            </h1>
+            <p className="text-white/50">Gestiona tus clientes y sus pendientes</p>
+          </div>
+        </div>
+        <button
+          onClick={openNewClientModal}
+          className="btn-accent flex items-center gap-2 py-3 px-5 self-start"
+        >
+          <Plus className="w-5 h-5" />
+          Nuevo Cliente
+        </button>
+      </div>
 
-            {/* Refresh */}
-            <button className="glass p-2 sm:p-3 rounded-xl hover:bg-white/10 transition-colors active:scale-95">
-              <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 text-white/50" />
-            </button>
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-dark-700/80 border border-white/5 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-blue-400" />
+          </div>
+          <div>
+            <p className="text-xl font-bold">{clients.length}</p>
+            <p className="text-white/50 text-xs">Clientes</p>
+          </div>
+        </div>
+        <div className="bg-dark-700/80 border border-white/5 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+          </div>
+          <div>
+            <p className="text-xl font-bold">{clients.filter(c => c.status === 'active').length}</p>
+            <p className="text-white/50 text-xs">Activos</p>
+          </div>
+        </div>
+        <div className="bg-dark-700/80 border border-white/5 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center relative">
+            <Clock className="w-5 h-5 text-orange-400" />
+            <Sparkles className="w-3 h-3 text-orange-500 absolute -top-1 -right-1 animate-pulse" />
+          </div>
+          <div>
+            <p className="text-xl font-bold">{totalPending}</p>
+            <p className="text-white/50 text-xs">Pendientes</p>
+          </div>
+        </div>
+        <div className="bg-dark-700/80 border border-white/5 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
+            <AlertCircle className="w-5 h-5 text-red-400" />
+          </div>
+          <div>
+            <p className="text-xl font-bold">{highPriority}</p>
+            <p className="text-white/50 text-xs">Urgentes</p>
           </div>
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-        <div className="glass-card p-3 sm:p-4 md:p-5 flex items-center gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-            <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xl sm:text-2xl font-bold">{clients.length}</p>
-            <p className="text-white/50 text-xs sm:text-sm truncate">Clientes</p>
-          </div>
+      {/* Search & Filters */}
+      <div className="bg-dark-700/80 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar clientes..."
+            className="w-full bg-dark-800 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder-white/30 focus:border-blue-500/50 focus:outline-none transition-colors"
+          />
         </div>
-        <div className="glass-card p-3 sm:p-4 md:p-5 flex items-center gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xl sm:text-2xl font-bold">{clients.filter(c => c.status === 'active').length}</p>
-            <p className="text-white/50 text-xs sm:text-sm truncate">Activos</p>
-          </div>
-        </div>
-        <div className="glass-card p-3 sm:p-4 md:p-5 flex items-center gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/20 flex items-center justify-center flex-shrink-0">
-            <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xl sm:text-2xl font-bold">{totalPending}</p>
-            <p className="text-white/50 text-xs sm:text-sm truncate">Pendientes</p>
-          </div>
-        </div>
-        <div className="glass-card p-3 sm:p-4 md:p-5 flex items-center gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0">
-            <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-400" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xl sm:text-2xl font-bold">{highPriority}</p>
-            <p className="text-white/50 text-xs sm:text-sm truncate">Urgentes</p>
-          </div>
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500/50 focus:outline-none transition-colors"
+        >
+          <option value="all">Todos</option>
+          <option value="active">Activos</option>
+          <option value="inactive">Inactivos</option>
+          <option value="pending">Pendientes</option>
+        </select>
+        <div className="flex items-center gap-2 bg-dark-800 rounded-xl p-1">
+          <button
+            onClick={() => setViewMode('grid')}
+            className={`p-2.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-white/50 hover:text-white'}`}
+          >
+            <LayoutGrid className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            className={`p-2.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-white/50 hover:text-white'}`}
+          >
+            <List className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
-      {/* Clients Grid/List */}
+      {/* Clients Display */}
       {filteredClients.length === 0 ? (
-        <div className="glass-card text-center py-16">
-          <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-6">
-            <Building2 className="w-10 h-10 text-white/30" />
+        <div className="bg-dark-700/80 border border-white/5 rounded-xl text-center py-16">
+          <div className="w-20 h-20 rounded-2xl bg-blue-500/10 flex items-center justify-center mx-auto mb-6 relative">
+            <Building2 className="w-10 h-10 text-blue-400" />
+            <Flame className="w-5 h-5 text-orange-500 absolute -top-1 -right-1 animate-pulse" />
           </div>
           <h3 className="text-xl font-bold mb-2">
             {searchTerm || filterStatus !== 'all' ? 'Sin resultados' : 'Sin clientes'}
@@ -314,7 +407,7 @@ export default function Maintenance() {
           </p>
           {!searchTerm && filterStatus === 'all' && (
             <button
-              onClick={() => setShowNewClient(true)}
+              onClick={openNewClientModal}
               className="btn-accent inline-flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
@@ -323,7 +416,7 @@ export default function Maintenance() {
           )}
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filteredClients.map((client) => {
             const pendingTasks = getPendingTasks(client.id)
             const clientTasks = getClientTasks(client.id)
@@ -334,66 +427,54 @@ export default function Maintenance() {
                 key={client.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="glass-card p-0 overflow-hidden hover:border-white/20 transition-all group"
+                className="bg-dark-700/80 border border-white/5 rounded-xl overflow-hidden hover:border-white/10 transition-all group"
               >
-                {/* Card Header with Avatar */}
-                <div className="p-6 pb-4">
+                {/* Card Header */}
+                <div className="p-5">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      {/* Avatar */}
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${client.color || 'from-blue-500 to-blue-600'} flex items-center justify-center text-white text-xl font-bold shadow-lg`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${client.color || 'from-blue-500 to-blue-600'} flex items-center justify-center text-white text-lg font-bold shadow-lg`}>
                         {getInitials(client.name)}
                       </div>
-                      {/* Status Badge */}
-                      <div className="flex flex-col gap-2">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold text-white ${statusOption?.color || 'bg-gray-500'}`}>
+                      <div>
+                        <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold text-white ${statusOption?.color || 'bg-gray-500'}`}>
                           {statusOption?.label || 'Activo'}
                         </span>
                         {pendingTasks.length > 0 && (
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                          <span className="ml-2 px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-500/20 text-orange-400 border border-orange-500/30">
                             {pendingTasks.length} pendientes
                           </span>
                         )}
                       </div>
                     </div>
-                    {/* Actions */}
-                    <button className="p-2 rounded-lg hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-all">
-                      <MoreVertical className="w-5 h-5 text-white/50" />
-                    </button>
                   </div>
 
-                  {/* Client Info */}
-                  <div className="mb-4">
-                    <h3 className="text-lg font-bold mb-1">{client.name}</h3>
-                    {client.contact && (
-                      <p className="text-white/50 text-sm">{client.contact}</p>
-                    )}
-                  </div>
+                  <h3 className="text-lg font-bold mb-1">{client.name}</h3>
+                  {client.contact && (
+                    <p className="text-white/50 text-sm mb-4 flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      {client.contact}
+                    </p>
+                  )}
 
                   {/* Contact Details */}
                   <div className="space-y-2">
                     {client.location && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                          <MapPin className="w-4 h-4 text-white/40" />
-                        </div>
-                        <span className="text-white/60">{client.location}</span>
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <MapPin className="w-4 h-4 text-white/40" />
+                        {client.location}
                       </div>
                     )}
                     {client.email && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                          <Mail className="w-4 h-4 text-white/40" />
-                        </div>
-                        <span className="text-white/60">{client.email}</span>
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <Mail className="w-4 h-4 text-white/40" />
+                        {client.email}
                       </div>
                     )}
                     {client.phone && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                          <Phone className="w-4 h-4 text-white/40" />
-                        </div>
-                        <span className="text-white/60">{client.phone}</span>
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <Phone className="w-4 h-4 text-white/40" />
+                        {client.phone}
                       </div>
                     )}
                   </div>
@@ -401,40 +482,51 @@ export default function Maintenance() {
 
                 {/* Tasks Preview */}
                 {pendingTasks.length > 0 && (
-                  <div className="px-6 py-4 border-t border-white/5 bg-white/[0.02]">
+                  <div className="px-5 py-4 border-t border-white/5 bg-dark-800/30">
                     <p className="text-xs text-white/40 uppercase tracking-wider mb-3">Tareas pendientes</p>
                     <div className="space-y-2">
                       {pendingTasks.slice(0, 2).map((task) => {
                         const priority = priorityOptions.find(p => p.value === task.priority)
                         return (
-                          <div key={task.id} className="flex items-center gap-2">
+                          <div
+                            key={task.id}
+                            className="flex items-center gap-2 group/task cursor-pointer"
+                            onClick={() => openEditTaskModal(task, client)}
+                          >
                             <div className={`w-2 h-2 rounded-full ${priority?.bg}`} />
-                            <span className="text-sm text-white/70 truncate flex-1">{task.description}</span>
+                            <span className="text-sm text-white/70 truncate flex-1 group-hover/task:text-white transition-colors">{task.description}</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleToggleTask(task)
+                              }}
+                              className="p-1 rounded hover:bg-emerald-500/20 transition-colors opacity-0 group-hover/task:opacity-100"
+                            >
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            </button>
                           </div>
                         )
                       })}
                       {pendingTasks.length > 2 && (
-                        <p className="text-xs text-white/30">+{pendingTasks.length - 2} mas...</p>
+                        <p className="text-xs text-white/30">+{pendingTasks.length - 2} más...</p>
                       )}
                     </div>
                   </div>
                 )}
 
-                {/* Card Actions */}
-                <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-white/5">
+                {/* Actions */}
+                <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-white/5">
                   <button
-                    onClick={() => {
-                      setSelectedClient(client)
-                      setShowNewTask(true)
-                    }}
+                    onClick={() => openNewTaskModal(client)}
                     className="p-2.5 rounded-xl bg-white/5 hover:bg-blue-500/20 hover:text-blue-400 transition-all"
                     title="Agregar tarea"
                   >
                     <Plus className="w-5 h-5" />
                   </button>
                   <button
+                    onClick={() => openEditClientModal(client)}
                     className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-all"
-                    title="Editar"
+                    title="Editar cliente"
                   >
                     <Edit3 className="w-5 h-5 text-white/50" />
                   </button>
@@ -452,7 +544,7 @@ export default function Maintenance() {
         </div>
       ) : (
         /* List View */
-        <div className="glass-card p-0 overflow-hidden divide-y divide-white/5">
+        <div className="bg-dark-700/80 border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
           {filteredClients.map((client) => {
             const pendingTasks = getPendingTasks(client.id)
             const statusOption = statusOptions.find(s => s.value === client.status)
@@ -460,26 +552,24 @@ export default function Maintenance() {
             return (
               <div
                 key={client.id}
-                className="flex items-center gap-6 p-5 hover:bg-white/[0.02] transition-colors"
+                className="flex items-center gap-4 p-4 hover:bg-white/[0.02] transition-colors"
               >
-                {/* Avatar */}
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${client.color || 'from-blue-500 to-blue-600'} flex items-center justify-center text-white font-bold flex-shrink-0`}>
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${client.color || 'from-blue-500 to-blue-600'} flex items-center justify-center text-white font-bold flex-shrink-0`}>
                   {getInitials(client.name)}
                 </div>
 
-                {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
+                  <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-bold truncate">{client.name}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium text-white ${statusOption?.color || 'bg-gray-500'}`}>
+                    <span className={`px-2 py-0.5 rounded-lg text-xs font-medium text-white ${statusOption?.color || 'bg-gray-500'}`}>
                       {statusOption?.label || 'Activo'}
                     </span>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-white/50">
-                    {client.location && (
+                    {client.contact && (
                       <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5" />
-                        {client.location}
+                        <User className="w-3.5 h-3.5" />
+                        {client.contact}
                       </span>
                     )}
                     {client.email && (
@@ -491,30 +581,31 @@ export default function Maintenance() {
                   </div>
                 </div>
 
-                {/* Pending Badge */}
                 {pendingTasks.length > 0 && (
                   <span className="px-3 py-1.5 rounded-xl text-sm font-medium bg-orange-500/20 text-orange-400">
                     {pendingTasks.length} pendientes
                   </span>
                 )}
 
-                {/* Actions */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <button
-                    onClick={() => {
-                      setSelectedClient(client)
-                      setShowNewTask(true)
-                    }}
-                    className="p-2.5 rounded-xl hover:bg-white/10 transition-colors"
+                    onClick={() => openNewTaskModal(client)}
+                    className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                    title="Nueva tarea"
                   >
                     <Plus className="w-5 h-5 text-white/50" />
                   </button>
-                  <button className="p-2.5 rounded-xl hover:bg-white/10 transition-colors">
+                  <button
+                    onClick={() => openEditClientModal(client)}
+                    className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                    title="Editar"
+                  >
                     <Edit3 className="w-5 h-5 text-white/50" />
                   </button>
                   <button
                     onClick={() => handleDeleteClient(client.id)}
-                    className="p-2.5 rounded-xl hover:bg-red-500/20 transition-colors"
+                    className="p-2 rounded-lg hover:bg-red-500/20 transition-colors"
+                    title="Eliminar"
                   >
                     <Trash2 className="w-5 h-5 text-red-400/50" />
                   </button>
@@ -525,45 +616,61 @@ export default function Maintenance() {
         </div>
       )}
 
-      {/* New Client Modal */}
+      {/* Client Modal */}
       <AnimatePresence>
-        {showNewClient && (
+        {showClientModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto"
-            onClick={() => setShowNewClient(false)}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowClientModal(false)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card w-full max-w-xl p-5 sm:p-8 md:p-10 my-4 sm:my-0"
+              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-8"
             >
-              <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">Agregar Cliente</h2>
-              <p className="text-white/50 text-sm sm:text-base mb-6 sm:mb-10">Completa la informacion del nuevo cliente</p>
-
-              <form onSubmit={handleAddClient} className="space-y-4 sm:space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
-                      Nombre de la Empresa *
-                    </label>
-                    <input
-                      type="text"
-                      value={clientForm.name}
-                      onChange={(e) => setClientForm({ ...clientForm, name: e.target.value })}
-                      placeholder="Ej: Empresa ABC"
-                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
-                      required
-                      autoFocus
-                    />
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center relative">
+                    {editingClient ? <Edit3 className="w-5 h-5 text-blue-400" /> : <Building2 className="w-5 h-5 text-blue-400" />}
+                    <Sparkles className="w-3 h-3 text-orange-500 absolute -top-1 -right-1 animate-pulse" />
                   </div>
-
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
+                    <h2 className="text-xl font-bold">{editingClient ? 'Editar Cliente' : 'Nuevo Cliente'}</h2>
+                    <p className="text-sm text-white/50">Mantenimiento</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowClientModal(false)}
+                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  <X className="w-5 h-5 text-white/50" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveClient} className="space-y-6">
+                <div>
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    Nombre de la Empresa *
+                  </label>
+                  <input
+                    type="text"
+                    value={clientForm.name}
+                    onChange={(e) => setClientForm({ ...clientForm, name: e.target.value })}
+                    placeholder="Ej: Empresa ABC"
+                    className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 focus:border-blue-500/50 focus:outline-none transition-colors"
+                    required
+                    autoFocus
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
                       Contacto
                     </label>
                     <input
@@ -571,25 +678,23 @@ export default function Maintenance() {
                       value={clientForm.contact}
                       onChange={(e) => setClientForm({ ...clientForm, contact: e.target.value })}
                       placeholder="Nombre del contacto"
-                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
+                      className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 focus:border-blue-500/50 focus:outline-none transition-colors"
                     />
                   </div>
-
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
-                      Ubicacion
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                      Ubicación
                     </label>
                     <input
                       type="text"
                       value={clientForm.location}
                       onChange={(e) => setClientForm({ ...clientForm, location: e.target.value })}
                       placeholder="Ciudad o zona"
-                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
+                      className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 focus:border-blue-500/50 focus:outline-none transition-colors"
                     />
                   </div>
-
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
                       Email
                     </label>
                     <input
@@ -597,56 +702,72 @@ export default function Maintenance() {
                       value={clientForm.email}
                       onChange={(e) => setClientForm({ ...clientForm, email: e.target.value })}
                       placeholder="correo@empresa.com"
-                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
+                      className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 focus:border-blue-500/50 focus:outline-none transition-colors"
                     />
                   </div>
-
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
-                      Telefono
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                      Teléfono
                     </label>
                     <input
                       type="tel"
                       value={clientForm.phone}
                       onChange={(e) => setClientForm({ ...clientForm, phone: e.target.value })}
                       placeholder="(000) 000-0000"
-                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
+                      className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 focus:border-blue-500/50 focus:outline-none transition-colors"
                     />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-3">
-                      Estado
-                    </label>
-                    <div className="flex gap-2 sm:gap-3">
-                      {statusOptions.map((status) => (
-                        <button
-                          key={status.value}
-                          type="button"
-                          onClick={() => setClientForm({ ...clientForm, status: status.value })}
-                          className={`flex-1 px-4 py-3.5 rounded-xl text-sm font-medium transition-all ${
-                            clientForm.status === status.value
-                              ? `${status.color} text-white`
-                              : 'glass hover:bg-white/10'
-                          }`}
-                        >
-                          {status.label}
-                        </button>
-                      ))}
-                    </div>
                   </div>
                 </div>
 
-                <div className="flex gap-3 sm:gap-4 pt-4 sm:pt-6">
+                <div>
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    Notas
+                  </label>
+                  <textarea
+                    value={clientForm.notes}
+                    onChange={(e) => setClientForm({ ...clientForm, notes: e.target.value })}
+                    placeholder="Notas adicionales sobre el cliente..."
+                    rows={3}
+                    className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 focus:border-blue-500/50 focus:outline-none transition-colors resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    Estado
+                  </label>
+                  <div className="flex gap-2">
+                    {statusOptions.map((status) => (
+                      <button
+                        key={status.value}
+                        type="button"
+                        onClick={() => setClientForm({ ...clientForm, status: status.value })}
+                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                          clientForm.status === status.value
+                            ? `${status.color} text-white`
+                            : 'bg-dark-700 border border-white/10 hover:bg-white/5'
+                        }`}
+                      >
+                        {status.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-4 pt-4">
                   <button
                     type="button"
-                    onClick={() => setShowNewClient(false)}
-                    className="flex-1 glass-button py-3 sm:py-4 text-sm sm:text-base"
+                    onClick={() => setShowClientModal(false)}
+                    className="flex-1 bg-dark-700 border border-white/10 rounded-xl py-3.5 font-medium hover:bg-white/5 transition-colors"
                   >
                     Cancelar
                   </button>
-                  <button type="submit" className="flex-1 btn-accent py-3 sm:py-4 text-sm sm:text-base">
-                    Agregar
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 rounded-xl py-3.5 font-medium transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Flame className="w-4 h-4" />
+                    {editingClient ? 'Guardar' : 'Agregar Cliente'}
                   </button>
                 </div>
               </form>
@@ -655,17 +776,18 @@ export default function Maintenance() {
         )}
       </AnimatePresence>
 
-      {/* New Task Modal */}
+      {/* Task Modal */}
       <AnimatePresence>
-        {showNewTask && selectedClient && (
+        {showTaskModal && selectedClient && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={() => {
-              setShowNewTask(false)
+              setShowTaskModal(false)
               setSelectedClient(null)
+              setEditingTask(null)
             }}
           >
             <motion.div
@@ -673,28 +795,49 @@ export default function Maintenance() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card w-full max-w-xl p-5 sm:p-8 md:p-10 my-4 sm:my-0"
+              className="bg-dark-800 border border-white/10 rounded-2xl w-full max-w-lg p-8"
             >
-              <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">Nueva Tarea</h2>
-              <p className="text-white/50 text-sm sm:text-base mb-6 sm:mb-10">Para: {selectedClient.name}</p>
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center relative">
+                    {editingTask ? <Edit3 className="w-5 h-5 text-orange-400" /> : <FileText className="w-5 h-5 text-orange-400" />}
+                    <Flame className="w-3 h-3 text-orange-500 absolute -top-1 -right-1 animate-pulse" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">{editingTask ? 'Editar Tarea' : 'Nueva Tarea'}</h2>
+                    <p className="text-sm text-white/50">{selectedClient.name}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowTaskModal(false)
+                    setSelectedClient(null)
+                    setEditingTask(null)
+                  }}
+                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  <X className="w-5 h-5 text-white/50" />
+                </button>
+              </div>
 
-              <form onSubmit={handleAddTask} className="space-y-5 sm:space-y-8">
+              <form onSubmit={handleSaveTask} className="space-y-6">
                 <div>
-                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-4">
-                    Descripcion
+                  <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                    Descripción *
                   </label>
                   <textarea
                     value={taskForm.description}
                     onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
-                    placeholder="Que hay que hacer?"
-                    className="glass-input w-full h-24 sm:h-32 resize-none py-3 sm:py-4 px-4 sm:px-5 text-sm sm:text-base"
+                    placeholder="¿Qué hay que hacer?"
+                    rows={4}
+                    className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none transition-colors resize-none"
                     autoFocus
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-4">
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
                       Prioridad
                     </label>
                     <div className="flex gap-2">
@@ -706,7 +849,7 @@ export default function Maintenance() {
                           className={`flex-1 px-3 py-3 rounded-xl text-sm font-medium transition-all ${
                             taskForm.priority === p.value
                               ? `${p.bg} text-white`
-                              : 'glass hover:bg-white/10'
+                              : 'bg-dark-700 border border-white/10 hover:bg-white/5'
                           }`}
                         >
                           {p.label}
@@ -715,31 +858,36 @@ export default function Maintenance() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-2 sm:mb-4">
-                      Fecha Limite
+                    <label className="block text-xs text-white/40 uppercase tracking-widest mb-3">
+                      Fecha Límite
                     </label>
                     <input
                       type="date"
                       value={taskForm.dueDate}
                       onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
-                      className="glass-input w-full py-3 sm:py-4 text-sm sm:text-base"
+                      className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:border-orange-500/50 focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
 
-                <div className="flex gap-3 sm:gap-4 pt-4 sm:pt-6">
+                <div className="flex gap-4 pt-4">
                   <button
                     type="button"
                     onClick={() => {
-                      setShowNewTask(false)
+                      setShowTaskModal(false)
                       setSelectedClient(null)
+                      setEditingTask(null)
                     }}
-                    className="flex-1 glass-button py-3 sm:py-4 text-sm sm:text-base"
+                    className="flex-1 bg-dark-700 border border-white/10 rounded-xl py-3.5 font-medium hover:bg-white/5 transition-colors"
                   >
                     Cancelar
                   </button>
-                  <button type="submit" className="flex-1 btn-accent py-3 sm:py-4 text-sm sm:text-base">
-                    Agregar
+                  <button
+                    type="submit"
+                    className="flex-1 bg-orange-500 hover:bg-orange-600 rounded-xl py-3.5 font-medium transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Flame className="w-4 h-4" />
+                    {editingTask ? 'Guardar' : 'Agregar Tarea'}
                   </button>
                 </div>
               </form>
