@@ -58,7 +58,7 @@ export function StatCard({ icon: Icon, value, label, color = 'orange', fire = tr
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <FireCard intensity="subtle" color={fireColors[color]}>
+        <FireCard intensity="medium" color={fireColors[color]}>
           <div className="p-5">
             <div className="flex items-center gap-4">
               <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${colors[color]} flex items-center justify-center flex-shrink-0`}>
@@ -100,7 +100,7 @@ export function QuickAction({ icon: Icon, title, description, onClick, fire = tr
         onClick={onClick}
         className="cursor-pointer"
       >
-        <FireCard intensity="subtle">
+        <FireCard intensity="medium">
           <div className="p-5 text-center">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center mx-auto mb-4">
               <Icon className="w-6 h-6 text-orange-400" />
