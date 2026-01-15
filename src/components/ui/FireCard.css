@@ -1,0 +1,111 @@
+.fire-card {
+  position: relative;
+  background: rgba(20, 20, 25, 0.9);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  overflow: visible;
+  transition: all 0.3s ease;
+}
+
+.fc-canvas-wrap {
+  position: absolute;
+  inset: -20px;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+
+.fc-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.fc-glow {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: transparent;
+  box-shadow:
+    0 0 15px var(--fire-color, #FF6B35),
+    0 0 30px rgba(255, 140, 66, 0.3);
+  opacity: 0.4;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  animation: fc-pulse 2.5s ease-in-out infinite;
+}
+
+.fc-content {
+  position: relative;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* Intensity variants */
+.fire-card.fc-subtle .fc-glow {
+  opacity: 0.2;
+  box-shadow:
+    0 0 10px var(--fire-color, #FF6B35),
+    0 0 20px rgba(255, 140, 66, 0.2);
+}
+
+.fire-card.fc-intense .fc-glow {
+  opacity: 0.6;
+  box-shadow:
+    0 0 20px var(--fire-color, #FF6B35),
+    0 0 40px var(--fire-secondary, #FF8C42),
+    0 0 60px rgba(255, 217, 61, 0.3);
+}
+
+/* Hover state */
+.fire-card:hover {
+  border-color: rgba(255, 107, 53, 0.4);
+  transform: translateY(-2px);
+}
+
+.fire-card:hover .fc-glow {
+  opacity: 0.6;
+}
+
+.fire-card.fc-subtle:hover .fc-glow {
+  opacity: 0.35;
+}
+
+.fire-card.fc-intense:hover .fc-glow {
+  opacity: 0.8;
+}
+
+@keyframes fc-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.fire-card.fc-subtle .fc-glow {
+  animation: fc-pulse-subtle 3s ease-in-out infinite;
+}
+
+@keyframes fc-pulse-subtle {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.fire-card.fc-intense .fc-glow {
+  animation: fc-pulse-intense 2s ease-in-out infinite;
+}
+
+@keyframes fc-pulse-intense {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}

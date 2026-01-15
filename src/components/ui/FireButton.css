@@ -1,0 +1,326 @@
+/* Fire Button Base */
+.fire-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  overflow: visible;
+  transition: transform 0.2s ease;
+}
+
+.fire-btn:hover {
+  transform: translateY(-2px);
+}
+
+.fire-btn:active {
+  transform: translateY(0);
+}
+
+.fire-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Size variants */
+.fire-btn.fb-sm {
+  padding: 10px 16px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+.fire-btn.fb-md {
+  padding: 14px 24px;
+  font-size: 14px;
+  border-radius: 12px;
+}
+
+.fire-btn.fb-lg {
+  padding: 18px 32px;
+  font-size: 16px;
+  border-radius: 14px;
+}
+
+/* Background layer */
+.fb-back {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 1;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.fire-btn:hover .fb-back {
+  transform: scale(1.02);
+}
+
+/* Glow layer */
+.fb-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: var(--btn-color);
+  filter: blur(12px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.fire-btn:hover .fb-glow {
+  opacity: 0.5;
+}
+
+/* Front content layer */
+.fb-front {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 1;
+}
+
+.fb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fb-label {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Sparks effect */
+.fb-sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.fb-spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #FFD93D;
+  opacity: 0;
+  box-shadow: 0 0 6px #FF8C42, 0 0 12px #FF6B35;
+}
+
+.fire-btn:hover .fb-spark:nth-child(1) {
+  animation: spark-fly-1 0.8s ease-out infinite;
+  left: 20%;
+  bottom: 0;
+}
+
+.fire-btn:hover .fb-spark:nth-child(2) {
+  animation: spark-fly-2 0.9s ease-out infinite 0.2s;
+  left: 50%;
+  bottom: 0;
+}
+
+.fire-btn:hover .fb-spark:nth-child(3) {
+  animation: spark-fly-3 0.7s ease-out infinite 0.4s;
+  left: 80%;
+  bottom: 0;
+}
+
+@keyframes spark-fly-1 {
+  0% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) translateX(-10px) scale(0);
+  }
+}
+
+@keyframes spark-fly-2 {
+  0% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) translateX(5px) scale(0);
+  }
+}
+
+@keyframes spark-fly-3 {
+  0% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-25px) translateX(10px) scale(0);
+  }
+}
+
+/* Glass variant */
+.fire-btn.fb-glass .fb-back {
+  opacity: 0.15;
+  backdrop-filter: blur(10px);
+}
+
+.fire-btn.fb-glass {
+  border: 1px solid rgba(255, 107, 53, 0.3);
+}
+
+.fire-btn.fb-glass:hover {
+  border-color: rgba(255, 107, 53, 0.5);
+}
+
+.fire-btn.fb-glass:hover .fb-back {
+  opacity: 0.25;
+}
+
+/* Outline variant */
+.fire-btn.fb-outline .fb-back {
+  opacity: 0;
+  border: 2px solid;
+  border-image: var(--btn-color) 1;
+}
+
+.fire-btn.fb-outline {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--dark-800), var(--dark-800)) padding-box,
+              var(--btn-color) border-box;
+}
+
+.fire-btn.fb-outline .fb-label {
+  background: var(--btn-color);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.fire-btn.fb-outline:hover .fb-back {
+  opacity: 0.1;
+}
+
+/* ==================== */
+/* Fire Icon Button     */
+/* ==================== */
+
+.fire-icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  overflow: visible;
+  transition: transform 0.2s ease;
+}
+
+.fire-icon-btn:hover {
+  transform: scale(1.1);
+}
+
+.fire-icon-btn:active {
+  transform: scale(0.95);
+}
+
+.fire-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Size variants */
+.fire-icon-btn.fib-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+.fire-icon-btn.fib-md {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+.fire-icon-btn.fib-lg {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+}
+
+.fib-back {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 1;
+  transition: transform 0.3s ease;
+}
+
+.fire-icon-btn:hover .fib-back {
+  transform: scale(1.05);
+}
+
+.fib-glow {
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: var(--btn-color);
+  filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.fire-icon-btn:hover .fib-glow {
+  opacity: 0.6;
+}
+
+.fib-front {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.fib-icon {
+  color: white;
+  display: flex;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.fib-icon svg {
+  width: 50%;
+  height: 50%;
+}
+
+.fire-icon-btn.fib-sm .fib-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.fire-icon-btn.fib-md .fib-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.fire-icon-btn.fib-lg .fib-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Button Group */
+.fire-btn-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
